@@ -14,15 +14,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
- 
+
 /**
  * Dutch language file for spatialhelper plugin
  *
- * @author mark 
+ * @author mark
  */
-
-// menu entry for admin plugins
-// $lang['menu'] = 'Your menu entry';
-
-// custom language strings for the plugin
-// $lang['fixme'] = 'FIXME';
