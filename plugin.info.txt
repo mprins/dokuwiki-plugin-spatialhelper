@@ -2,6 +2,6 @@ base   ${project.artifactId}
 author Mark C. Prins
 email  mc.prins@gmail.com
 date   ${buildNumber} (${project.version})
-name   spatialhelper plugin
-desc   spatial helpers
-url    http://www.dokuwiki.org/plugin:${project.artifactId}
+name   ${project.name}
+desc   ${project.description}
+url    ${project.url}
