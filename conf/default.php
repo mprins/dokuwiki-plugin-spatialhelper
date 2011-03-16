@@ -16,10 +16,12 @@
  */
 
 /**
- * English language file for spatialhelper plugin
+ * default configuration settings.
  *
- * @author mark
+ * @author Mark C. Prins
  * @license BSD license
  */
-// custom language strings for the plugin
-$lang['nothingfound'] = 'Nothing found.';
+$conf['namespace']      = 'tag';       // where should tag links point to? default: 'tag'
+$conf['sortkey']        = 'distance';     // sort key for topic lists
+$conf['sortorder']      = 'ascending'; // ascending or descending
+$conf['pagelist_flags'] = 'list';      // formatting options for the page list plugin

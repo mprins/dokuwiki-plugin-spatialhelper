@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2008-2011 Mark C. Prins <mc.prins@gmail.com>
+ * Copyright (c) 2011 Mark C. Prins <mc.prins@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
 /**
  * DokuWiki Plugin spatialhelper (search Helper Component)
  *
- * @license BSD
+ * @license BSD license
  * @author Mark Prins
  */
 
@@ -59,31 +59,52 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	}
 
 	function findNearbyLatLon($lat,$lon){
-		return $this->findNearby(Geohash:: encode($lat, $lon));
+		return $this->findNearby(Geohash::encode($lat, $lon));
 	}
 
 	function findNearby($geohash) {
 		dbglog("Looking for $geohash", "--- spatialhelper_search::findNearby ---");
-		$docIds=array();
+		
+		$decoded=Geohash::decode($geohash);
+		dbglog($decoded,"decoded geohash");
+		
+		$docIds = array();
+		$BBOX   = array();
 		// find adjacent blocks
-		// $adjacent = Geohash::adjacent($geohash, $dir);
-		// for each subhash in $adjacent
-		// get all the pages findForSubHash($subhash)
-		//$subhash='';
-		//$found = array_filter/array_keys (
-		//	$this->$spatial_idx , function($geohash) use ($subhash) { return ( $subhash is part of $geohash); }  );
-		// sort all the pages using the sort key
+		$adjacent = array();
+		$adjacent['center']		 = $geohash;
+		$adjacent['top']         = Geohash::adjacent($adjacent['center'], 'top');
+		$adjacent['bottom']      = Geohash::adjacent($adjacent['center'], 'bottom');
+		$adjacent['right']       = Geohash::adjacent($adjacent['center'], 'right');
+		$adjacent['left']        = Geohash::adjacent($adjacent['center'], 'left');
+		$adjacent['topleft']     = Geohash::adjacent($adjacent['left'],   'top');
+		$adjacent['topright']    = Geohash::adjacent($adjacent['right'],  'top');
+		$adjacent['bottomright'] = Geohash::adjacent($adjacent['right'],  'bottom');
+		$adjacent['bottomleft']  = Geohash::adjacent($adjacent['left'],   'bottom');
+
+		dbglog($adjacent,"adjacent geo hashes");
+		// find all the pages in the index that overlap with the adjacent hashes
+		foreach ($adjacent as $adjHash){
+			foreach ($this->spatial_idx as $_geohash => $_docIds) {
+				if (strstr($_geohash, $adjHash)){
+					dbglog("Found adjacent geo hash: $adjHash in $_geohash");
+					// if $adjHash similar to geohash
+					$docIds = array_merge($docIds, $_docIds);
+				}
+			}
+		}
+		$BBOX['center'] = array($decoded[0][2],$decoded[1][2]);
+		$decoded=Geohash::decode($adjacent['bottomleft']);
+		$BBOX['bottomleft'] = array($decoded[0][0],$decoded[1][0]);
+		$decoded=Geohash::decode($adjacent['topright']);
+		$BBOX['topright'] = array($decoded[0][1],$decoded[1][1]);
+
+		// TODO sort all the pages using the sort key?
 		// return the list
-		return array();
+		dbglog($docIds, "found docIDs");
+		dbglog($BBOX, "inside bbox");
+		return array($docIds, $BBOX);
 	}
-
-	private  function findHashesForSubHash($subhash) {
-		$hashes = array();
-		//using http://www.php.net/manual/en/function.array-filter.php
-		return $hashes;
-	}
-
-
 
 	/**
 	 * Calculate a new coordinate based on start, distance and bearing

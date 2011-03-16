@@ -16,10 +16,13 @@
  */
 
 /**
- * English language file for spatialhelper plugin
+ *  configuration metadata.
  *
- * @author mark
+ * @author Mark C. Prins
  * @license BSD license
  */
-// custom language strings for the plugin
-$lang['nothingfound'] = 'Nothing found.';
+
+$meta['namespace']      = array('string');
+$meta['sortkey']        = array('distance','multichoice', '_choices' => array('cdate', 'mdate', 'pagename', 'id', 'title'));
+$meta['sortorder']      = array('multichoice', '_choices' => array('ascending', 'descending'));
+$meta['pagelist_flags'] = array('string');
