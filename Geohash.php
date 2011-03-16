@@ -3,6 +3,7 @@
  * Geohash
  *
  * @author      Keisuke SATO
+ * @author		Mark C. Prins <mc.prins@gmail.com>
  * @license     MIT License
  *
  *
@@ -82,7 +83,7 @@ class Geohash
 	/**
 	 * Geohash decode
 	 * @param   string $geohash
-	 * @return  array
+	 * @return  array with three lat/lon pairs where [0]=lower left, [1]=upper right, [2]=center
 	 */
 	static public function decode($geohash){
 		/***

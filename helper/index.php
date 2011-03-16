@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2008-2011 Mark C. Prins <mc.prins@gmail.com>
+ * Copyright (c) 2011 Mark C. Prins <mc.prins@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
 /**
  * DokuWiki Plugin spatialhelper (index Helper Component)
  *
- * @license BSD
+ * @license BSD license
  * @author Mark Prins
  */
 
@@ -67,15 +67,15 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @param string $id the document ID
 	 */
 	function updateSpatialIndex($id) {
-		dbglog('reading getoags','--- spatialhelper_index::updateSpatialIndex ---');
+		dbglog('reading geo metadata','--- spatialhelper_index::updateSpatialIndex ---');
 		$geotags = p_get_metadata($id, 'geo');
 		//TODO we need just lat/lon, so check for those
 		//     (and maybe validate the values -90/90 and -180/180)
 		if(empty($geotags)) {
-			dbglog("No geotags found for page $id, done");
+			dbglog("No geo metadata found for page '$id', done");
 			return true;
 		}
-		dbglog($geotags,"Geotags found for page $id");
+		dbglog($geotags,"Geo metadata found for page $id");
 		$geohash = Geohash::encode($geotags['lat'],$geotags['lon']);
 		dbglog('Update index for geohash: '.$geohash);
 
