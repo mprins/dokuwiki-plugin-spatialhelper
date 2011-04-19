@@ -14,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 /**
  * DokuWiki Plugin spatialhelper (index Helper Component)
  *
@@ -128,7 +127,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @param array $index spatial index
 	 */
 	function findHashesForId($id,$index) {
-		$hashes=array();
+		$hashes = array();
 		foreach ($index as $hash => $docIds){
 			dbglog($docIds, "Inspecting element $hash for $id");
 			if(in_array($id, $docIds, false)){
@@ -146,13 +145,19 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	function deleteFromIndex($id){
 		// check the index for document
 		$knownHashes = $this->findHashesForId($id, $this->spatial_idx);
+		if(empty($knownHashes)) return;
+
 		// TODO shortcut, need to make sure there is only one element, if not the index is corrupt
-		$knownHash=$knownHashes[0];
+		$knownHash = $knownHashes[0];
 		$knownIds = $this->spatial_idx[$knownHash];
 		$i = array_search($id,$knownIds);
-		dbglog("removing: $knownIds[$i] from the index");
+		dbglog("removing: $knownIds[$i] from the index.");
 		unset($knownIds[$i]);
-		$this->spatial_idx[$knownHash]=$knownIds;
+		$this->spatial_idx[$knownHash] = $knownIds;
+		if(empty($this->spatial_idx[$knownHash])) {
+			dbglog("removing key: $knownHash from the index.");
+			unset ($this->spatial_idx[$knownHash]);
+		}
 		$this->_saveIndex();
 	}
 	/**

@@ -35,6 +35,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	public function register(Doku_Event_Handler &$controller) {
 		// http://www.dokuwiki.org/devel:event:indexer_page_add
 		$controller->register_hook('INDEXER_PAGE_ADD', 'BEFORE', $this, '_updateSpatialIndex');
+		$controller->register_hook('IO_WIKIPAGE_WRITE', 'BEFORE', $this, '_removeFromIndex');
 		// http://www.dokuwiki.org/devel:event:sitemap_generate
 		// $controller->register_hook('SITEMAP_GENERATE', 'BEFORE', $this, '_createspatialsitemap');
 		// http://www.dokuwiki.org/devel:event:sitemap_ping
@@ -50,11 +51,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 */
 	function _updateSpatialIndex(Doku_Event &$event, $param) {
 		$version = getVersionData();
-		dbglog($version, "dokuwiki version data");
+		//dbglog($version, "dokuwiki version data");
 		$id="";
 		if ($version['date'] < '2011-03-06') {
 			/*
-			  Anteater and previous
+			 Anteater and previous
 			 $event→data[0] – the page id
 			 $event→data[1] – empty, can be filled by additional content to index by your plugin
 			 */
@@ -70,14 +71,45 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			$id = $event->data['page'];
 		}
 		dbg("start update index for page: $id",'--- action_plugin_spatialhelper::_updateSpatialIndex ---');
-		dbg("loading helper spatialhelper_index.");
 		$indexer = plugin_load('helper', 'spatialhelper_index');
 
-		if (!$indexer) dbglog("plugin not found. \$indexer = $indexer");
 		if($indexer) {
-			dbglog("loaded helper spatialhelper_index.");
 			$entries = $indexer->updateSpatialIndex($id);
 			dbglog("Done indexing, entries: $entries",'--- action_plugin_spatialhelper::_updateSpatialIndex ---');
+		}
+	}
+	
+	/**
+	 * Update the spatial index, removing the page.
+	 * @param Doku_Event $event event object by reference
+	 * @param object $param the parameters passed to register_hook when this handler was registered
+	 */
+	function _removeFromIndex(Doku_Event &$event,$param) {
+		/* event data:
+		 $data[0] – The raw arguments for io_saveFile as an array. Do not change file path.
+		 $data[0][0] – the file path.
+		 $data[0][1] – the content to be saved, and may be modified.
+		 $data[1] – ns: The colon separated namespace path minus the trailing page name. (false if root ns)
+		 $data[2] – page_name: The wiki page name.
+		 $data[3] – rev: The page revision, false for current wiki pages.
+		 */
+		//dbglog($event->data,"Event data in _removeFromIndex.");
+		if (@file_exists($event->data[0][0])) {
+			// file not new
+			if (!$event->data[0][1]) {
+				// file is empty, page is being deleted
+				if(empty($event->data[1])){
+					// root namespace
+					$id = $event->data[2];
+				} else {
+					$id = $event->data[1].":".$event->data[2];
+				}
+				$indexer = plugin_load('helper', 'spatialhelper_index');
+				if($indexer) {
+					dbglog("loaded helper spatialhelper_index. Deleting $id from index");
+					$indexer->deleteFromIndex($id);
+				}
+			}
 		}
 	}
 
