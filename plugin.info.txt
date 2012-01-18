@@ -1,6 +1,6 @@
 base   ${project.artifactId}
 author Mark C. Prins
-email  mc.prins@gmail.com
+email  mprins@users.sf.net
 date   ${buildNumber} (${project.version})
 name   ${project.name}
 desc   ${project.description}
