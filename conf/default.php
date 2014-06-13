@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011 Mark C. Prins <mc.prins@gmail.com>
+ * Copyright (c) 2011-2014 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,6 +22,6 @@
  * @license BSD license
  */
 $conf['namespace']      = 'tag';       // where should tag links point to? default: 'tag'
-$conf['sortkey']        = 'distance';     // sort key for topic lists
+$conf['sortkey']        = 'distance';  // sort key for topic lists
 $conf['sortorder']      = 'ascending'; // ascending or descending
 $conf['pagelist_flags'] = 'list';      // formatting options for the page list plugin
