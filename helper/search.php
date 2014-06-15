@@ -89,22 +89,26 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 */
 	function findNearby($geohash) {
 		dbglog ( "Looking for $geohash", "--- spatialhelper_search::findNearby ---" );
+		$_geohashClass = new Geohash();
 
-		$decodedPoint = geoPHP::load ( $geohash, 'geohash' );
-		dbglog ( $decodedPoint, "decoded geohash" );
+		$decodedPoint = $_geohashClass->read( $geohash);
+		// lat,lon
+		$location = $decodedPoint->y () . ',' . $decodedPoint->x ();
+		dbglog($location, "decoded location");
 
 		$docIds = array ();
 		// find adjacent blocks
 		$adjacent = array ();
 		$adjacent ['center'] = $geohash;
-		$adjacent ['top'] = Geohash::adjacent ( $adjacent ['center'], 'top' );
-		$adjacent ['bottom'] = Geohash::adjacent ( $adjacent ['center'], 'bottom' );
-		$adjacent ['right'] = Geohash::adjacent ( $adjacent ['center'], 'right' );
-		$adjacent ['left'] = Geohash::adjacent ( $adjacent ['center'], 'left' );
-		$adjacent ['topleft'] = Geohash::adjacent ( $adjacent ['left'], 'top' );
-		$adjacent ['topright'] = Geohash::adjacent ( $adjacent ['right'], 'top' );
-		$adjacent ['bottomright'] = Geohash::adjacent ( $adjacent ['right'], 'bottom' );
-		$adjacent ['bottomleft'] = Geohash::adjacent ( $adjacent ['left'], 'bottom' );
+		
+		$adjacent ['top'] = $_geohashClass->adjacent ( $adjacent ['center'], 'top' );
+		$adjacent ['bottom'] = $_geohashClass->adjacent ( $adjacent ['center'], 'bottom' );
+		$adjacent ['right'] = $_geohashClass->adjacent ( $adjacent ['center'], 'right' );
+		$adjacent ['left'] = $_geohashClass->adjacent ( $adjacent ['center'], 'left' );
+		$adjacent ['topleft'] = $_geohashClass->adjacent ( $adjacent ['left'], 'top' );
+		$adjacent ['topright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'top' );
+		$adjacent ['bottomright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'bottom' );
+		$adjacent ['bottomleft'] = $_geohashClass->adjacent ( $adjacent ['left'], 'bottom' );
 
 		dbglog ( $adjacent, "adjacent geo hashes" );
 		// find all the pages in the index that overlap with the adjacent hashes
@@ -123,9 +127,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		// TODO sort all the pages using the sort key?
 		// return the list
 		dbglog ( $docIds, "found docIDs" );
-		// lat,lon
-		$location = $decodedPoint->y () . ',' . $decodedPoint->x ();
-		// dbglog($location, "location");
 		return array (
 				array_unique($docIds),
 				$location
