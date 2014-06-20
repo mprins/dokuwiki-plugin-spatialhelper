@@ -16,10 +16,6 @@
  */
 if (! defined ( 'DOKU_INC' ))
 	die ();
-if (! defined ( 'DOKU_LF' ))
-	define ( 'DOKU_LF', "\n" );
-if (! defined ( 'DOKU_TAB' ))
-	define ( 'DOKU_TAB', "\t" );
 if (! defined ( 'DOKU_PLUGIN' ))
 	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
 
@@ -44,6 +40,30 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 * @var array
 	 */
 	var $spatial_idx = array ();
+
+	/**
+	 * Precision, Distance of Adjacent Cell in Meters.
+	 *
+	 * @see https://stackoverflow.com/questions/13836416/geohash-and-max-distance
+	 *
+	 * @var float
+	 */
+	private $precision = array (
+			5003530,
+			625441,
+			123264,
+			19545,
+			3803,
+			610,
+			118,
+			19,
+			3.71,
+			0.6
+	);
+
+	/**
+	 * handle to the geoPHP plugin.
+	 */
 	var $geophp;
 
 	/**
@@ -52,19 +72,20 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	function helper_plugin_spatialhelper_search() {
 		dbglog ( 'initialize', '--- spatialhelper_search::helper_plugin_spatialhelper_search ---' );
 		global $conf;
-		$this->idx_dir = $conf ['indexdir'];
-		dbglog ( $this->idx_dir );
-		// for now just assume there is a valid index and load it
-		dbglog ( "loading spatial index" );
-		$this->spatial_idx = unserialize ( io_readFile ( $fn = $this->idx_dir . '/spatial.idx', false ) );
-		dbglog ( $this->spatial_idx, "done loading spatial index" );
 
 		if (! $geophp = &plugin_load ( 'helper', 'geophp' )) {
 			$message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
 			msg ( $message, - 1 );
-			dbglog ( $geophp, $message );
 			return "";
 		}
+
+		$idx_dir = $conf ['indexdir'];
+		if (! @file_exists ( $idx_dir . '/spatial.idx' )) {
+			$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+			$indexer->helper_plugin_spatialhelper_index ();
+		}
+
+		$this->spatial_idx = unserialize ( io_readFile ( $fn = $idx_dir . '/spatial.idx', false ) );
 	}
 
 	/**
@@ -76,31 +97,33 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *        	The x coordinate (or longitude)
 	 */
 	function findNearbyLatLon($lat, $lon) {
+		dbglog ( "Looking for $lat, $lon", "--- spatialhelper_search::findNearbyLatLon ---" );
 		$geometry = new Point ( $lon, $lat );
-		return $this->findNearby ( $geometry->out ( 'geohash' ) );
+		return $this->findNearby ( $geometry->out ( 'geohash' ), $geometry );
 	}
 
 	/**
 	 * finds nearby elements in the index based on the geohash.
 	 * returns a list of documents and the bunding box.
 	 *
-	 * @param String $geohash
-	 * @return multitype:multitype:multitype:NULL multitype:
+	 * @param string $geohash
+	 * @param Point $p
+	 *        	optional point
+	 * @return array of ...
 	 */
-	function findNearby($geohash) {
+	function findNearby($geohash, Point $p = null) {
 		dbglog ( "Looking for $geohash", "--- spatialhelper_search::findNearby ---" );
-		$_geohashClass = new Geohash();
 
-		$decodedPoint = $_geohashClass->read( $geohash);
-		// lat,lon
-		$location = $decodedPoint->y () . ',' . $decodedPoint->x ();
-		dbglog($location, "decoded location");
+		$_geohashClass = new Geohash ();
+		if (! $p) {
+			$decodedPoint = $_geohashClass->read ( $geohash );
+		} else {
+			$decodedPoint = $p;
+		}
 
-		$docIds = array ();
 		// find adjacent blocks
 		$adjacent = array ();
 		$adjacent ['center'] = $geohash;
-		
 		$adjacent ['top'] = $_geohashClass->adjacent ( $adjacent ['center'], 'top' );
 		$adjacent ['bottom'] = $_geohashClass->adjacent ( $adjacent ['center'], 'bottom' );
 		$adjacent ['right'] = $_geohashClass->adjacent ( $adjacent ['center'], 'right' );
@@ -109,9 +132,10 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		$adjacent ['topright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'top' );
 		$adjacent ['bottomright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'bottom' );
 		$adjacent ['bottomleft'] = $_geohashClass->adjacent ( $adjacent ['left'], 'bottom' );
+		// dbglog ( $adjacent, "adjacent geo hashes:" );
 
-		dbglog ( $adjacent, "adjacent geo hashes" );
 		// find all the pages in the index that overlap with the adjacent hashes
+		$docIds = array ();
 		foreach ( $adjacent as $adjHash ) {
 			if (is_array ( $this->spatial_idx )) {
 				foreach ( $this->spatial_idx as $_geohash => $_docIds ) {
@@ -123,46 +147,54 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 				}
 			}
 		}
+		array_unique ( $docIds );
+		// dbglog ( $docIds, "found docIDs" );
 
-		// TODO sort all the pages using the sort key?
-		// return the list
-		dbglog ( $docIds, "found docIDs" );
+		// create associative array of pages + calculate distance
+		$pages = array ();
+		$media = array ();
+		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+
+		foreach ( $docIds as $id ) {
+			if (strpos ( $id, 'media__', 0 ) === 0) {
+				$id = substr ( $id, strlen ( 'media__' ) );
+				if (auth_quickaclcheck ( $id ) >= /*AUTH_READ*/1) {
+					$point = $indexer->getCoordsFromExif ( $id );
+					$line = new LineString ( [
+							$decodedPoint,
+							$point
+							] );
+					$media [] = array (
+							'id' => $id,
+							'distance' => ( int ) ($line->greatCircleLength ()),
+							// optionally add other meta such as tag, description...
+					);
+				}
+			} else {
+				if (auth_quickaclcheck ( $id ) >= /*AUTH_READ*/1) {
+					$geotags = p_get_metadata ( $id, 'geo' );
+					$point = new Point ( $geotags ['lon'], $geotags ['lat'] );
+					$line = new LineString ( [
+							$decodedPoint,
+							$point
+					] );
+					$pages [] = array (
+							'id' => $id,
+							'distance' => ( int ) ($line->greatCircleLength ()),
+							'description' => p_get_metadata ( $id, 'description' )['abstract'],
+							// optionally add other meta such as tag...
+					);
+				}
+			}
+		}
+		// TODO sort all the pages using distance?
+
 		return array (
-				array_unique($docIds),
-				$location
+				$pages,
+				$media,
+				$decodedPoint->y () . ',' . $decodedPoint->x (),
+				$geohash,
+				$this->precision [strlen ( $geohash )] * 1000
 		);
-	}
-
-	/**
-	 * Calculate a new coordinate based on start, distance and bearing
-	 *
-	 * @param $start array
-	 *        	- start coordinate as decimal lat/lon pair
-	 * @param $dist float
-	 *        	- distance in kilometers
-	 * @param $brng float
-	 *        	- bearing in degrees (compass direction)
-	 */
-	function geo_destination($start, $dist, $brng) {
-		$lat1 = _toRad ( $start [0] );
-		$lon1 = _toRad ( $start [1] );
-		// http://en.wikipedia.org/wiki/Earth_radius
-		// average earth radius in km
-		$dist = $dist / 6371.01;
-		$brng = _toRad ( $brng );
-
-		$lon2 = $lon1 + atan2 ( sin ( $brng ) * sin ( $dist ) * cos ( $lat1 ), cos ( $dist ) - sin ( $lat1 ) * sin ( $lat2 ) );
-		$lon2 = fmod ( ($lon2 + 3 * pi ()), (2 * pi ()) ) - pi ();
-
-		return array (
-				_toDeg ( $lat2 ),
-				_toDeg ( $lon2 )
-		);
-	}
-	private function _toRad($deg) {
-		return $deg * pi () / 180;
-	}
-	private function _toDeg($rad) {
-		return $rad * 180 / pi ();
 	}
 }

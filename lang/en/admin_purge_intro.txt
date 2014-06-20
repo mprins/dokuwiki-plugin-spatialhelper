@@ -1,0 +1,3 @@
+======Purge spatial index======
+
+In case the spatial index has been corrupted it may be purged.

@@ -18,6 +18,8 @@ if (! defined ( 'DOKU_INC' ))
 	die ();
 if (! defined ( 'DOKU_PLUGIN' ))
 	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
+if (! defined ( 'DOKU_LF' ))
+	define ( 'DOKU_LF', "\n" );
 require_once (DOKU_PLUGIN . 'action.php');
 
 /**
@@ -35,18 +37,22 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	DokuWiki's event controller object. Also available as global $EVENT_HANDLER
 	 */
 	public function register(Doku_Event_Handler &$controller) {
-		// listen for page add / delete
+		// listen for page add / delete events
 		// http://www.dokuwiki.org/devel:event:indexer_page_add
 		$controller->register_hook ( 'INDEXER_PAGE_ADD', 'BEFORE', $this, '_updateSpatialIndex' );
 		$controller->register_hook ( 'IO_WIKIPAGE_WRITE', 'BEFORE', $this, '_removeFromIndex' );
 
 		// http://www.dokuwiki.org/devel:event:sitemap_generate
-		$controller->register_hook ( 'SITEMAP_GENERATE', 'BEFORE', $this, '_createspatialsitemap' );
+		// using after will only trigger us if a sitemap was actually created
+		$controller->register_hook ( 'SITEMAP_GENERATE', 'AFTER', $this, '_createSpatialSitemap' );
+
 		// http://www.dokuwiki.org/devel:event:sitemap_ping
 		// $controller->register_hook('SITEMAP_PING', 'AFTER', $this, '_ping');
+
 		// handle actions we know of
 		$controller->register_hook ( 'ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_trap_action', array () );
 		$controller->register_hook ( 'TPL_ACT_UNKNOWN', 'BEFORE', $this, '_findnearby', array () );
+
 		// listen for media uploads and deletes
 		$controller->register_hook ( 'MEDIA_UPLOAD_FINISH', 'BEFORE', $this, '_handle_media_uploaded', array () );
 		$controller->register_hook ( 'MEDIA_DELETE_FILE', 'BEFORE', $this, '_handle_media_deleted', array () );
@@ -61,28 +67,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	the parameters passed to register_hook when this handler was registered
 	 */
 	function _updateSpatialIndex(Doku_Event &$event, $param) {
-		// $version = getVersionData();
-		// dbglog($version, "dokuwiki version data");
-		$id = "";
-		// if ($version['date'] < '2011-03-06') {
-		// /*
-		// Anteater and previous
-		// $event→data[0] – the page id
-		// $event→data[1] – empty, can be filled by additional content to index by your plugin
-		// */
-		// $id = $event->data[0];
-		// } else {
-		/*
-		 * As of 2011-03-06 the data structure has been changed to:
-		 * $event→data['page'] – the page id
-		 * $event→data['body'] – empty, can be filled by additional content to index by your plugin
-		 * $event→data['metadata'] – the metadata that shall be indexed. This is an array where the keys are the metadata indexes and the value a string or an array of strings with the values. title and relation_references will already be set.
-		 */
+		// $event→data['page'] – the page id
+		// $event→data['body'] – empty, can be filled by additional content to index by your plugin
+		// $event→data['metadata'] – the metadata that shall be indexed. This is an array where the keys are the metadata indexes and the value a string or an array of strings with the values. title and relation_references will already be set.
 		$id = $event->data ['page'];
-		// }
 		dbg ( "start update spatial index for page: $id", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
-		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
 
+		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
 		if ($indexer) {
 			$entries = $indexer->updateSpatialIndex ( $id );
 			dbglog ( "Done indexing, entries: $entries", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
@@ -100,16 +91,15 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	the parameters passed to register_hook when this handler was registered
 	 */
 	function _removeFromIndex(Doku_Event &$event, $param) {
-		/*
-		 * event data:
-		 * $data[0] – The raw arguments for io_saveFile as an array. Do not change file path.
-		 * $data[0][0] – the file path.
-		 * $data[0][1] – the content to be saved, and may be modified.
-		 * $data[1] – ns: The colon separated namespace path minus the trailing page name. (false if root ns)
-		 * $data[2] – page_name: The wiki page name.
-		 * $data[3] – rev: The page revision, false for current wiki pages.
-		 */
-		// dbglog($event->data,"Event data in _removeFromIndex.");
+		// event data:
+		// $data[0] – The raw arguments for io_saveFile as an array. Do not change file path.
+		// $data[0][0] – the file path.
+		// $data[0][1] – the content to be saved, and may be modified.
+		// $data[1] – ns: The colon separated namespace path minus the trailing page name. (false if root ns)
+		// $data[2] – page_name: The wiki page name.
+		// $data[3] – rev: The page revision, false for current wiki pages.
+		dbglog ( $event->data, "Event data in _removeFromIndex." );
+
 		if (@file_exists ( $event->data [0] [0] )) {
 			// file not new
 			if (! $event->data [0] [1]) {
@@ -122,7 +112,6 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				}
 				$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
 				if ($indexer) {
-					dbglog ( "loaded helper spatialhelper_index. Deleting $id from index" );
 					$indexer->deleteFromIndex ( $id );
 				}
 			}
@@ -137,24 +126,29 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param mixed $param
 	 *        	not used
 	 */
-	private function _createspatialsitemap(Doku_Event &$event, $param) {
-		/*
-		 * $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
-		 * $event→data['sitemap']: The path of the file the sitemap will be saved to.
-		 */
-		dbglog ( $event->data ['items'], "Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki" );
-		dbglog ( $event->data ['sitemap'], "The path of the file the sitemap will be saved to." );
+	function _createSpatialSitemap(Doku_Event &$event, $param) {
+		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
+		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
+		dbglog ( $event->data, "_createSpatialSitemap" );
+		dbglog ( $param, "_createSpatialSitemap" );
+		// TODO add a new SitemapItem object that point to the KML of public geocoded pages
+		// global $conf;
+		// $url = $conf['baseurl'].$conf['cachedir'].'/sitemap.kml';
+		// $lastmod = @filemtime($conf['cachedir'].'/sitemap.kml);
+		// $event->data['items'][] = new SitemapItem($url,$lastmod);
 	}
 
 	/**
 	 * trap findnearby action.
+	 * This addional handler is
+	 * required as described at: https://www.dokuwiki.org/devel:event:tpl_act_unknown
 	 *
 	 * @param Doku_Event $event
 	 *        	event object by reference
 	 * @param mixed $param
 	 *        	not used
 	 */
-	function _trap_action(&$event, $param) {
+	function _trap_action(Doku_Event &$event, $param) {
 		if ($event->data != 'findnearby')
 			return;
 		$event->preventDefault ();
@@ -169,75 +163,89 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	not used
 	 */
 	function _findnearby(Doku_Event &$event, $param) {
-		global $lang;
 		if ($event->data != 'findnearby')
 			return;
 		$event->preventDefault ();
 
-		$tagns = $this->getConf ( 'namespace' );
-		$flags = explode ( ',', trim ( $this->getConf ( 'pagelist_flags' ) ) );
-
-		// TODO findNearbyLatLon()
-		$geohash = trim ( str_replace ( $this->getConf ( 'namespace' ) . ':', '', $_REQUEST ['geohash'] ) );
-
+		global $INPUT;
+		$dist_prefix = '';
 		if ($helper = &plugin_load ( 'helper', 'spatialhelper_search' )) {
-			$results = $helper->findNearby ( $geohash );
-			$ids = ( array ) ($results [0]);
-			$location = ( string ) ($results [1]);
-			foreach ( $ids as $id ) {
-				$pages [] = array (
-						'id' => $id
-				);
+			if ($INPUT->has ( 'geohash' )) {
+				$results = $helper->findNearby ( $INPUT->str ( 'geohash' ) );
+				$dist_prefix = hsc($this->getLang ('result_distance_prefix')).' ';
+			} elseif ($INPUT->has ( 'lat' ) && $INPUT->has ( 'lon' )) {
+				$results = $helper->findNearbyLatLon ( $INPUT->param ( 'lat' ), $INPUT->param ( 'lon' ) );
+			} else {
+				print '<div class="level1"><p>' . hsc ( $this->getLang ('invalidinput') ) . '</p></div>';
 			}
+			$pages = ( array ) ($results [0]);
+			$media = ( array ) $results [1];
+			$location = ( string ) ($results [2]);
+			$geohash = ( string ) ($results [3]);
+			$precision = $results [4];
 		}
-		// use html_buildlist() instead for media...
 
+		print '<h1>' . $this->getLang ('results_header') . '</h1>' . DOKU_LF;
+		print '<div class="level1">' . DOKU_LF;
 		if (! empty ( $pages )) {
-			// let Pagelist Plugin do the work for us
-			if (plugin_isdisabled ( 'pagelist' ) || (! $pagelist = plugin_load ( 'helper', 'pagelist' ))) {
-				msg ( $this->getLang ( 'missing_pagelistplugin' ), - 1 );
-				return false;
-			}
-
-			$pagelist->setFlags ( $flags );
-			$pagelist->startList ();
+			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $pages as $page ) {
-				$pagelist->addPage ( $page );
+				$pagelist .= '<li>' . html_wikilink ( ':' . $page ['id'], useHeading ( 'navigation' ) ? null : noNS ( $page ['id'] ) ) . ' (' . $dist_prefix . $page ['distance'] . 'm) ' . $page ['description'] . '</li>' . DOKU_LF;
 			}
-			// TODO convert geohash to lat/lon
-			print '<h1>Geohash: ' . str_replace ( '_', ' ', $_REQUEST ['geohash'] ) . ' (lat,lon: ' . $location . ')</h1>' . DOKU_LF;
-			print '<div class="level1">' . DOKU_LF;
-			print $pagelist->finishList ();
+			$pagelist .= '</ol>' . DOKU_LF;
+
+			print '<h2>' . $this->getLang ('results_pages') . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>';
+			print '<div class="level2">' . DOKU_LF;
+			print $pagelist;
+			print "<p>Precision: $precision m</p>\n";
 			print '</div>' . DOKU_LF;
 		} else {
-			print '<div class="level1"><p>' . $lang ['nothingfound'] . '</p></div>';
+			print '<p>' . hsc ( $this->getLang ('nothingfound') ) . '</p>';
 		}
+		if (! empty ( $media )) {
+			$pagelist = '<ol>' . DOKU_LF;
+			foreach ( $media as $m ) {
+				$opts = array();
+				$link = ml ( $m ['id'], $opts, false, '&amp;', false );
+				$opts ['w'] = '100px';
+				$src = ml ( $m ['id'], $opts );
+				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) </li>'. DOKU_LF;
+			}
+			$pagelist .= '</ol>' . DOKU_LF;
+
+			print '<h2>' . $this->getLang ('results_media') . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
+			print '<div class="level2">' . DOKU_LF;
+			print $pagelist;
+			print "<p>Precision: $precision m</p>\n";
+			print '</div>' . DOKU_LF;
+		}
+		print '</div>' . DOKU_LF;
 	}
+	/**
+	 * add media to spatial index.
+	 *
+	 * @param Doku_Event $event
+	 *        	event object by reference
+	 * @param unknown $param
+	 */
 	function _handle_media_uploaded(Doku_Event &$event, $param) {
-		/*
-		 * data[0] temporary file name (read from $_FILES)
-		 * data[1] file name of the file being uploaded
-		 * data[2] future directory id of the file being uploaded
-		 * data[3] the mime type of the file being uploaded
-		 * data[4] true if the uploaded file exists already
-		 * data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
-		 */
+		// data[0] temporary file name (read from $_FILES)
+		// data[1] file name of the file being uploaded
+		// data[2] future directory id of the file being uploaded
+		// data[3] the mime type of the file being uploaded
+		// data[4] true if the uploaded file exists already
+		// data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
+		dbglog ( $event->data, "_handle_media_uploaded::event data" );
 
 		// check the list of mimetypes
 		// if it's a supported type call appropriate index function
-		dbglog ( "checking uploaded media with mimetype " . $event->data [3] );
-		dbglog ( $event->data, "_handle_media_uploaded::event data" );
-		// if(stristr('image/',$event->data[3])){
-		if (substr_compare ( $event->data [3], 'image/jpeg', 0 ))
-		// TODO add image/tiff
-		{
-
+		if (substr_compare ( $event->data [3], 'image/jpeg', 0 )) {
 			$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
 			if ($indexer) {
-				dbglog ( "Loaded helper spatialhelper_index." );
 				$indexer->indexImage ( $event->data [2], $event->data [1] );
 			}
 		}
+		// TODO add image/tiff
 		// TODO kml, gpx, geojson...
 	}
 
@@ -245,21 +253,49 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * removes the media from the index.
 	 */
 	function _handle_media_deleted(Doku_Event &$event, $param) {
-		/*
-		 * data['id'] ID
-		 * data['unl'] unlink return code
-		 * data['del'] Namespace directory unlink return code
-		 * data['name'] file name
-		 * data['path'] full path to the file
-		 * data['size'] file size
-		 */
+		// data['id'] ID data['unl'] unlink return code
+		// data['del'] Namespace directory unlink return code
+		// data['name'] file name data['path'] full path to the file
+		// data['size'] file size
 		dbglog ( $event->data, "_handle_media_deleted::event data" );
-		$id = $event->data ['id'];
-		// remove the id from the index
+
+		// remove the media id from the index
 		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
 		if ($indexer) {
-			dbglog ( "Loaded helper spatialhelper_index. Deleting media $id from index" );
-			$indexer->deleteFromIndex ( $id );
+			$indexer->deleteFromIndex ( 'media__' . $event->data ['id'] );
 		}
+	}
+
+	/**
+	 * Calculate a new coordinate based on start, distance and bearing
+	 *
+	 * @param $start array
+	 *        	- start coordinate as decimal lat/lon pair
+	 * @param $dist float
+	 *        	- distance in kilometers
+	 * @param $brng float
+	 *        	- bearing in degrees (compass direction)
+	 */
+	private function _geo_destination($start, $dist, $brng) {
+		$lat1 = _toRad ( $start [0] );
+		$lon1 = _toRad ( $start [1] );
+		// http://en.wikipedia.org/wiki/Earth_radius
+		// average earth radius in km
+		$dist = $dist / 6371.01;
+		$brng = _toRad ( $brng );
+
+		$lon2 = $lon1 + atan2 ( sin ( $brng ) * sin ( $dist ) * cos ( $lat1 ), cos ( $dist ) - sin ( $lat1 ) * sin ( $lat2 ) );
+		$lon2 = fmod ( ($lon2 + 3 * pi ()), (2 * pi ()) ) - pi ();
+
+		return array (
+				_toDeg ( $lat2 ),
+				_toDeg ( $lon2 )
+		);
+	}
+	private function _toRad($deg) {
+		return $deg * pi () / 180;
+	}
+	private function _toDeg($rad) {
+		return $rad * 180 / pi ();
 	}
 }

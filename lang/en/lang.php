@@ -22,4 +22,11 @@
  * @license BSD license
  */
 $lang['nothingfound'] = 'Nothing found.';
-$lang['missing_pagelistplugin'] = 'The pagelist plugin is missing or is disabled in this wiki.';
+$lang['invalidinput'] = 'No valid input was given.';
+$lang['results_header'] = 'Searchresults';
+$lang['results_pages'] = 'Pages nearby';
+$lang['results_media'] = 'Media nearby';
+$lang['result_distance_prefix'] = 'Not further than';
+
+$lang['admin_submit'] = 'Purge spatial index';
+$lang['admin_purged_tiles'] = 'Spatial index was purged.';

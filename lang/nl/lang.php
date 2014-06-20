@@ -22,4 +22,11 @@
  * @license BSD license
  */
 $lang['nothingfound'] = 'Niets gevonden.';
-$lang['missing_pagelistplugin'] = 'De pagelist plugin ontbreekt of is uitgeschakeld in deze wiki.';
+$lang['invalidinput'] = 'Geen geldige invoer gegeven.';
+$lang['results_header'] = 'Zoekresultaten';
+$lang['results_pages'] = 'Pagina\'s in de buurt';
+$lang['results_media'] = 'Media in de buurt';
+$lang['result_distance_prefix'] = 'Niet meer dan';
+
+$lang['admin_submit'] = 'Ruimtelijke index wissen.';
+$lang['admin_purged_tiles'] = 'Ruimtelijke index gewist';

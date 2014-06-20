@@ -1,0 +1,3 @@
+======Ruimtelijke index wissen======
+
+In het geval van corruptie van de ruimtelijke index kan deze worden geleegd.

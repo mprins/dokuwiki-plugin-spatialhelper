@@ -21,7 +21,5 @@
  * @author Mark C. Prins
  * @license BSD license
  */
-$conf['namespace']      = 'tag';       // where should tag links point to? default: 'tag'
 $conf['sortkey']        = 'distance';  // sort key for topic lists
 $conf['sortorder']      = 'ascending'; // ascending or descending
-$conf['pagelist_flags'] = 'list';      // formatting options for the page list plugin

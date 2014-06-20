@@ -21,8 +21,5 @@
  * @author Mark C. Prins
  * @license BSD license
  */
-
-$meta['namespace']      = array('string');
 $meta['sortkey']        = array('distance','multichoice', '_choices' => array('cdate', 'mdate', 'pagename', 'id', 'title', 'distance'));
 $meta['sortorder']      = array('multichoice', '_choices' => array('ascending', 'descending'));
-$meta['pagelist_flags'] = array('string');
