@@ -20,18 +20,12 @@ if (! defined ( 'DOKU_PLUGIN' ))
 	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
 
 /**
- * DokuWiki Plugin spatialhelper (search Helper Component).
+ * DokuWiki Plugin spatialhelper (search component).
  *
  * @license BSD license
  * @author Mark Prins
  */
 class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
-	/**
-	 * directory for index files
-	 *
-	 * @var string
-	 */
-	var $idx_dir = '';
 	/**
 	 * spatial index, well lookup list so we can do spatial queries.
 	 * entries should be:
@@ -39,7 +33,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *
 	 * @var array
 	 */
-	var $spatial_idx = array ();
+	protected $spatial_idx = array ();
 
 	/**
 	 * Precision, Distance of Adjacent Cell in Meters.
@@ -64,13 +58,13 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	/**
 	 * handle to the geoPHP plugin.
 	 */
-	var $geophp;
+	protected $geophp;
 
 	/**
-	 * constructor.
+	 * constructor; initialize spatial index.
 	 */
-	function helper_plugin_spatialhelper_search() {
-		dbglog ( 'initialize', '--- spatialhelper_search::helper_plugin_spatialhelper_search ---' );
+	function __construct() {
+		// parent::__construct ();
 		global $conf;
 
 		if (! $geophp = &plugin_load ( 'helper', 'geophp' )) {
@@ -82,7 +76,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		$idx_dir = $conf ['indexdir'];
 		if (! @file_exists ( $idx_dir . '/spatial.idx' )) {
 			$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
-			$indexer->helper_plugin_spatialhelper_index ();
 		}
 
 		$this->spatial_idx = unserialize ( io_readFile ( $fn = $idx_dir . '/spatial.idx', false ) );
@@ -97,7 +90,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *        	The x coordinate (or longitude)
 	 */
 	function findNearbyLatLon($lat, $lon) {
-		dbglog ( "Looking for $lat, $lon", "--- spatialhelper_search::findNearbyLatLon ---" );
 		$geometry = new Point ( $lon, $lat );
 		return $this->findNearby ( $geometry->out ( 'geohash' ), $geometry );
 	}
@@ -112,8 +104,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 * @return array of ...
 	 */
 	function findNearby($geohash, Point $p = null) {
-		dbglog ( "Looking for $geohash", "--- spatialhelper_search::findNearby ---" );
-
 		$_geohashClass = new Geohash ();
 		if (! $p) {
 			$decodedPoint = $_geohashClass->read ( $geohash );
@@ -140,7 +130,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 			if (is_array ( $this->spatial_idx )) {
 				foreach ( $this->spatial_idx as $_geohash => $_docIds ) {
 					if (strstr ( $_geohash, $adjHash )) {
-						dbglog ( "Found adjacent geo hash: $adjHash in $_geohash" );
+						// dbglog ( "Found adjacent geo hash: $adjHash in $_geohash" );
 						// if $adjHash similar to geohash
 						$docIds = array_merge ( $docIds, $_docIds );
 					}
@@ -163,12 +153,12 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 					$line = new LineString ( [
 							$decodedPoint,
 							$point
-							] );
+					] );
 					$media [] = array (
 							'id' => $id,
-							'distance' => ( int ) ($line->greatCircleLength ()),
-							// optionally add other meta such as tag, description...
-					);
+							'distance' => ( int ) ($line->greatCircleLength ())
+					// optionally add other meta such as tag, description...
+										);
 				}
 			} else {
 				if (auth_quickaclcheck ( $id ) >= /*AUTH_READ*/1) {
@@ -181,9 +171,9 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 					$pages [] = array (
 							'id' => $id,
 							'distance' => ( int ) ($line->greatCircleLength ()),
-							'description' => p_get_metadata ( $id, 'description' )['abstract'],
-							// optionally add other meta such as tag...
-					);
+							'description' => p_get_metadata ( $id, 'description' )['abstract']
+					// optionally add other meta such as tag...
+										);
 				}
 			}
 		}

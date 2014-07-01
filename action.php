@@ -30,6 +30,10 @@ require_once (DOKU_PLUGIN . 'action.php');
  */
 class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 
+	// TODO add configurable namespace, NOTE if $mediaID is namespaced the directory may need to be created
+	private $media_kml = ':sitemap.kml';
+	private $media_georss = ':sitemap.georss';
+
 	/**
 	 * Register for events.
 	 *
@@ -39,23 +43,23 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	public function register(Doku_Event_Handler &$controller) {
 		// listen for page add / delete events
 		// http://www.dokuwiki.org/devel:event:indexer_page_add
-		$controller->register_hook ( 'INDEXER_PAGE_ADD', 'BEFORE', $this, '_updateSpatialIndex' );
+		$controller->register_hook ( 'INDEXER_PAGE_ADD', 'BEFORE', $this, 'handle_indexer_page_add' );
 		$controller->register_hook ( 'IO_WIKIPAGE_WRITE', 'BEFORE', $this, '_removeFromIndex' );
 
 		// http://www.dokuwiki.org/devel:event:sitemap_generate
+		$controller->register_hook ( 'SITEMAP_GENERATE', 'BEFORE', $this, 'handle_sitemap_generate_before' );
 		// using after will only trigger us if a sitemap was actually created
-		$controller->register_hook ( 'SITEMAP_GENERATE', 'AFTER', $this, '_createSpatialSitemap' );
-
-		// http://www.dokuwiki.org/devel:event:sitemap_ping
-		// $controller->register_hook('SITEMAP_PING', 'AFTER', $this, '_ping');
+		$controller->register_hook ( 'SITEMAP_GENERATE', 'AFTER', $this, 'handle_sitemap_generate_after' );
 
 		// handle actions we know of
-		$controller->register_hook ( 'ACTION_ACT_PREPROCESS', 'BEFORE', $this, '_trap_action', array () );
+		$controller->register_hook ( 'ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handle_action_act_preprocess', array () );
 		$controller->register_hook ( 'TPL_ACT_UNKNOWN', 'BEFORE', $this, '_findnearby', array () );
 
 		// listen for media uploads and deletes
 		$controller->register_hook ( 'MEDIA_UPLOAD_FINISH', 'BEFORE', $this, '_handle_media_uploaded', array () );
 		$controller->register_hook ( 'MEDIA_DELETE_FILE', 'BEFORE', $this, '_handle_media_deleted', array () );
+
+		$controller->register_hook ( 'TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'handle_metaheader_output' );
 	}
 
 	/**
@@ -66,19 +70,17 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param object $param
 	 *        	the parameters passed to register_hook when this handler was registered
 	 */
-	function _updateSpatialIndex(Doku_Event &$event, $param) {
+	function handle_indexer_page_add(Doku_Event &$event, $param) {
 		// $event→data['page'] – the page id
 		// $event→data['body'] – empty, can be filled by additional content to index by your plugin
 		// $event→data['metadata'] – the metadata that shall be indexed. This is an array where the keys are the metadata indexes and the value a string or an array of strings with the values. title and relation_references will already be set.
 		$id = $event->data ['page'];
-		dbg ( "start update spatial index for page: $id", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
-
-		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+		$indexer = & plugin_load ( 'helper', 'spatialhelper_index' );
 		if ($indexer) {
 			$entries = $indexer->updateSpatialIndex ( $id );
-			dbglog ( "Done indexing, entries: $entries", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
+			// dbglog ( "Done indexing, entries: $entries", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
 		} else {
-			dbglog ( $indexer, '--- action_plugin_spatialhelper::_updateSpatialIndex: spatial indexer not found ---' );
+			// dbglog ( $indexer, '--- action_plugin_spatialhelper::_updateSpatialIndex: spatial indexer not found ---' );
 		}
 	}
 
@@ -98,8 +100,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $data[1] – ns: The colon separated namespace path minus the trailing page name. (false if root ns)
 		// $data[2] – page_name: The wiki page name.
 		// $data[3] – rev: The page revision, false for current wiki pages.
-		dbglog ( $event->data, "Event data in _removeFromIndex." );
 
+		// dbglog ( $event->data, "Event data in _removeFromIndex." );
 		if (@file_exists ( $event->data [0] [0] )) {
 			// file not new
 			if (! $event->data [0] [1]) {
@@ -110,12 +112,25 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				} else {
 					$id = $event->data [1] . ":" . $event->data [2];
 				}
-				$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+				$indexer = & plugin_load ( 'helper', 'spatialhelper_index' );
 				if ($indexer) {
 					$indexer->deleteFromIndex ( $id );
 				}
 			}
 		}
+	}
+
+	/**
+	 * Add a new SitemapItem object that points to the KML of public geocoded pages.
+	 *
+	 * @param Doku_Event $event
+	 * @param unknown $param
+	 */
+	function handle_sitemap_generate_before(Doku_Event &$event, $param) {
+		$path = mediaFN ( $this->media_kml );
+		$lastmod = @filemtime ( $path );
+		$event->data ['items'] [] = new SitemapItem ( ml ( $this->media_kml, '', true, '&amp;', true ), $lastmod );
+		// dbglog ( $event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages." );
 	}
 
 	/**
@@ -126,29 +141,35 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param mixed $param
 	 *        	not used
 	 */
-	function _createSpatialSitemap(Doku_Event &$event, $param) {
+	function handle_sitemap_generate_after(Doku_Event &$event, $param) {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
-		dbglog ( $event->data, "_createSpatialSitemap" );
-		dbglog ( $param, "_createSpatialSitemap" );
-		// TODO add a new SitemapItem object that point to the KML of public geocoded pages
-		// global $conf;
-		// $url = $conf['baseurl'].$conf['cachedir'].'/sitemap.kml';
-		// $lastmod = @filemtime($conf['cachedir'].'/sitemap.kml);
-		// $event->data['items'][] = new SitemapItem($url,$lastmod);
+		global $conf;
+
+		// dbglog ($event->data['items'], "createSpatialSitemap loading helper" );
+
+		if ($helper = & plugin_load ( 'helper', 'spatialhelper_sitemap' )) {
+			// dbglog ( $helper, "createSpatialSitemap loaded helper." );
+
+			$kml = $helper->createKMLSitemap ( $this->media_kml );
+			$rss = $helper->createGeoRSSSitemap ( $this->media_georss );
+
+			return $kml && $rss;
+		} else {
+			// dbglog ( $helper, "createSpatialSitemap NOT loaded helper." );
+		}
 	}
 
 	/**
 	 * trap findnearby action.
-	 * This addional handler is
-	 * required as described at: https://www.dokuwiki.org/devel:event:tpl_act_unknown
+	 * This addional handler is required as described at: https://www.dokuwiki.org/devel:event:tpl_act_unknown
 	 *
 	 * @param Doku_Event $event
 	 *        	event object by reference
 	 * @param mixed $param
 	 *        	not used
 	 */
-	function _trap_action(Doku_Event &$event, $param) {
+	function handle_action_act_preprocess(Doku_Event &$event, $param) {
 		if ($event->data != 'findnearby')
 			return;
 		$event->preventDefault ();
@@ -169,14 +190,14 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 
 		global $INPUT;
 		$dist_prefix = '';
-		if ($helper = &plugin_load ( 'helper', 'spatialhelper_search' )) {
+		if ($helper = & plugin_load ( 'helper', 'spatialhelper_search' )) {
 			if ($INPUT->has ( 'geohash' )) {
 				$results = $helper->findNearby ( $INPUT->str ( 'geohash' ) );
-				$dist_prefix = hsc($this->getLang ('result_distance_prefix')).' ';
+				$dist_prefix = hsc ( $this->getLang ( 'result_distance_prefix' ) ) . ' ';
 			} elseif ($INPUT->has ( 'lat' ) && $INPUT->has ( 'lon' )) {
 				$results = $helper->findNearbyLatLon ( $INPUT->param ( 'lat' ), $INPUT->param ( 'lon' ) );
 			} else {
-				print '<div class="level1"><p>' . hsc ( $this->getLang ('invalidinput') ) . '</p></div>';
+				print '<div class="level1"><p>' . hsc ( $this->getLang ( 'invalidinput' ) ) . '</p></div>';
 			}
 			$pages = ( array ) ($results [0]);
 			$media = ( array ) $results [1];
@@ -185,7 +206,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			$precision = $results [4];
 		}
 
-		print '<h1>' . $this->getLang ('results_header') . '</h1>' . DOKU_LF;
+		print '<h1>' . $this->getLang ( 'results_header' ) . '</h1>' . DOKU_LF;
 		print '<div class="level1">' . DOKU_LF;
 		if (! empty ( $pages )) {
 			$pagelist = '<ol>' . DOKU_LF;
@@ -194,26 +215,26 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
-			print '<h2>' . $this->getLang ('results_pages') . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>';
+			print '<h2>' . $this->getLang ( 'results_pages' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>';
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
 			print "<p>Precision: $precision m</p>\n";
 			print '</div>' . DOKU_LF;
 		} else {
-			print '<p>' . hsc ( $this->getLang ('nothingfound') ) . '</p>';
+			print '<p>' . hsc ( $this->getLang ( 'nothingfound' ) ) . '</p>';
 		}
 		if (! empty ( $media )) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $media as $m ) {
-				$opts = array();
+				$opts = array ();
 				$link = ml ( $m ['id'], $opts, false, '&amp;', false );
 				$opts ['w'] = '100px';
 				$src = ml ( $m ['id'], $opts );
-				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) </li>'. DOKU_LF;
+				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) </li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
-			print '<h2>' . $this->getLang ('results_media') . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
+			print '<h2>' . $this->getLang ( 'results_media' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
 			print "<p>Precision: $precision m</p>\n";
@@ -235,7 +256,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// data[3] the mime type of the file being uploaded
 		// data[4] true if the uploaded file exists already
 		// data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
-		dbglog ( $event->data, "_handle_media_uploaded::event data" );
+
+		// dbglog ( $event->data, "_handle_media_uploaded::event data" );
 
 		// check the list of mimetypes
 		// if it's a supported type call appropriate index function
@@ -257,13 +279,40 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// data['del'] Namespace directory unlink return code
 		// data['name'] file name data['path'] full path to the file
 		// data['size'] file size
-		dbglog ( $event->data, "_handle_media_deleted::event data" );
+
+		// dbglog ( $event->data, "_handle_media_deleted::event data" );
 
 		// remove the media id from the index
-		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+		$indexer = & plugin_load ( 'helper', 'spatialhelper_index' );
 		if ($indexer) {
 			$indexer->deleteFromIndex ( 'media__' . $event->data ['id'] );
 		}
+	}
+
+	/**
+	 * add a link to the spatial sitemap files in the header.
+	 *
+	 * @param Doku_Event $event
+	 *        	the DokuWiki event. $event->data is a two-dimensional
+	 *        	array of all meta headers. The keys are meta, link and script.
+	 * @param unknown_type $param
+	 *
+	 * @see http://www.dokuwiki.org/devel:event:tpl_metaheader_output
+	 */
+	public function handle_metaheader_output(Doku_Event &$event, $param) {
+		// TODO maybe test for exist
+		$event->data ["link"] [] = array (
+				"type" => "application/atom+xml",
+				"rel" => "alternate",
+				"href" => ml ( $this->media_georss ),
+				"title" => "Spatial ATOM Feed"
+		);
+		$event->data ["link"] [] = array (
+				"type" => "application/vnd.google-earth.kml+xml",
+				"rel" => "alternate",
+				"href" => ml ( $this->media_kml ),
+				"title" => "KML Sitemap"
+		);
 	}
 
 	/**
