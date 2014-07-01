@@ -81,7 +81,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$RSSstart .= '<subtitle>' . $conf ['tagline'] . '</subtitle>' . DOKU_LF;
 		$RSSstart .= '<link href="' . DOKU_URL . '" />' . DOKU_LF;
 		$RSSstart .= '<link href="' . ml ( $mediaID, '', true, '&amp;', true ) . '" rel="self" />' . DOKU_LF;
-		$RSSstart .= '<updated>' . date ( DATE_RSS ) . '</updated>' . DOKU_LF;
+		$RSSstart .= '<updated>' . date ( DATE_ATOM ) . '</updated>' . DOKU_LF;
 		// $RSSstart .= '<id></id>'.DOKU_LF;
 		$RSSend = '</feed>' . DOKU_LF;
 
@@ -141,6 +141,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$KMLstart .= '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom"><Document>' . DOKU_LF;
 		$KMLstart .= '<name>' . $conf ['title'] . ' spatial sitemap</name>' . DOKU_LF;
 		$KMLstart .= '<atom:link rel="related" href="' . DOKU_URL . '" />' . DOKU_LF;
+		$RSSstart .= '<atom:updated>' . date ( DATE_ATOM ) . '</atom:updated>' . DOKU_LF;
 		$KMLstart .= '<Style id="icon"><IconStyle><color>ffffffff</color><scale>1</scale>';
 		$KMLstart .= '<Icon><href>' . DOKU_BASE . 'lib/plugins/spatialhelper/wikiitem.png</href></Icon></IconStyle></Style>' . DOKU_LF;
 
