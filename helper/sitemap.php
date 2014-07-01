@@ -114,8 +114,8 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 						$entry .= '  <georss:elev>' . $meta ['geo'] ['alt'] . '</georss:elev>' . DOKU_LF;
 					}
 					$entry .= '  <link href="' . wl ( $id ) . '" />' . DOKU_LF;
-					$entry .= '  <author>' . $meta ['user'] . '</author>' . DOKU_LF;
-					$entry .= '  <updated>' . $meta ['date'] ['modified'] . '</updated>' . DOKU_LF;
+					$entry .= '  <author><name>' . $meta ['user'] . '</name></author>' . DOKU_LF;
+					$entry .= '  <updated>' . date_iso8601($meta ['date'] ['modified']) . '</updated>' . DOKU_LF;
 					$entry .= '  <id>' . $id . '</id>' . DOKU_LF;
 					$entry .= '</entry>' . DOKU_LF;
 					fwrite ( $fh, $entry );
@@ -178,8 +178,8 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 					}
 					$plcm .= '</coordinates></Point>' . DOKU_LF;
 					$plcm .= '  <atom:link href="' . wl ( $id, '' . true ) . '" />' . DOKU_LF;
-					$plcm .= '  <atom:author>' . $meta ['user'] . '</atom:author>' . DOKU_LF;
-					$plcm .= '  <atom:updated>' . $meta ['date'] ['modified'] . '</atom:updated>' . DOKU_LF;
+					$plcm .= '  <atom:author><atom:name>' . $meta ['user'] . '</atom:name></atom:author>' . DOKU_LF;
+					$plcm .= '  <atom:updated>' . date_iso8601($meta ['date'] ['modified']) . '</atom:updated>' . DOKU_LF;
 					$plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
 					$plcm .= '</Placemark>' . DOKU_LF;
 
