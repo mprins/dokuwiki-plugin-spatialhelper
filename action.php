@@ -53,7 +53,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 
 		// handle actions we know of
 		$controller->register_hook ( 'ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handle_action_act_preprocess', array () );
-		$controller->register_hook ( 'TPL_ACT_UNKNOWN', 'BEFORE', $this, '_findnearby', array () );
+		$controller->register_hook ( 'TPL_ACT_UNKNOWN', 'BEFORE', $this, '_findnearby', array (
+				'format' => 'HTML'
+		) );
+
+		$controller->register_hook ( 'AJAX_CALL_UNKNOWN', 'BEFORE', $this, '_findnearby', array (
+				'format' => 'JSON'
+		) );
 
 		// listen for media uploads and deletes
 		$controller->register_hook ( 'MEDIA_UPLOAD_FINISH', 'BEFORE', $this, '_handle_media_uploaded', array () );
@@ -76,12 +82,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $event→data['metadata'] – the metadata that shall be indexed. This is an array where the keys are the metadata indexes and the value a string or an array of strings with the values. title and relation_references will already be set.
 		$id = $event->data ['page'];
 		$indexer = & plugin_load ( 'helper', 'spatialhelper_index' );
-		if ($indexer) {
-			$entries = $indexer->updateSpatialIndex ( $id );
-			// dbglog ( "Done indexing, entries: $entries", '--- action_plugin_spatialhelper::_updateSpatialIndex ---' );
-		} else {
-			// dbglog ( $indexer, '--- action_plugin_spatialhelper::_updateSpatialIndex: spatial indexer not found ---' );
-		}
+		$entries = $indexer->updateSpatialIndex ( $id );
 	}
 
 	/**
@@ -137,9 +138,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * Create a spatial sitemap or attach the geo/kml map to the sitemap.
 	 *
 	 * @param Doku_Event $event
-	 *        	event object by reference
+	 *        	event object by reference, not used
 	 * @param mixed $param
-	 *        	not used
+	 *        	parameter array, not used
 	 */
 	function handle_sitemap_generate_after(Doku_Event &$event, $param) {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
@@ -181,7 +182,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param Doku_Event $event
 	 *        	event object by reference
 	 * @param mixed $param
-	 *        	not used
+	 *        	'format'=>
 	 */
 	function _findnearby(Doku_Event &$event, $param) {
 		if ($event->data != 'findnearby')
@@ -197,15 +198,56 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			} elseif ($INPUT->has ( 'lat' ) && $INPUT->has ( 'lon' )) {
 				$results = $helper->findNearbyLatLon ( $INPUT->param ( 'lat' ), $INPUT->param ( 'lon' ) );
 			} else {
-				print '<div class="level1"><p>' . hsc ( $this->getLang ( 'invalidinput' ) ) . '</p></div>';
+				$results = array (
+						'error' => hsc ( $this->getLang ( 'invalidinput' ) )
+				);
 			}
-			$pages = ( array ) ($results [0]);
-			$media = ( array ) $results [1];
-			$location = ( string ) ($results [2]);
-			$geohash = ( string ) ($results [3]);
-			$precision = $results [4];
 		}
 
+		$showMedia = $INPUT->bool ( 'showMedia', true );
+
+		switch ($param ['format']) {
+			case 'JSON' :
+				$this->printJSON ( $results );
+				break;
+			case 'HTML' :
+			default :
+				$this->printHTML ( $results, $showMedia );
+				break;
+		}
+	}
+
+	/**
+	 * Print seachresults as HTML lists.
+	 *
+	 * @param array $searchresults
+	 */
+	private function printJSON($searchresults) {
+		require_once DOKU_INC . 'inc/JSON.php';
+		$json = new JSON ();
+
+		header ( 'Content-Type: application/json' );
+		print $json->encode ( $searchresults );
+	}
+
+	/**
+	 * Print seachresults as HTML lists.
+	 *
+	 * @param array $searchresults
+	 * @param boolean $showMedia
+	 */
+	private function printHTML($searchresults, $showMedia = true) {
+		$pages = ( array ) ($searchresults ['pages']);
+		$media = ( array ) $searchresults ['media'];
+		$location = ( string ) $searchresults ['latlon'];
+		$geohash = ( string ) $searchresults ['geohash'];
+
+		if (isset ( $searchresults ['error'] )) {
+			print '<div class="level1"><p>' . hsc ( $results ['error'] ) . '</p></div>';
+			return;
+		}
+
+		// print a HTML list
 		print '<h1>' . $this->getLang ( 'results_header' ) . '</h1>' . DOKU_LF;
 		print '<div class="level1">' . DOKU_LF;
 		if (! empty ( $pages )) {
@@ -218,12 +260,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			print '<h2>' . $this->getLang ( 'results_pages' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>';
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
-			print "<p>Precision: $precision m</p>\n";
+			print '<p>Precision: ' . $searchresults ['precision'] . ' m</p>' . DOKU_LF;
 			print '</div>' . DOKU_LF;
 		} else {
 			print '<p>' . hsc ( $this->getLang ( 'nothingfound' ) ) . '</p>';
 		}
-		if (! empty ( $media )) {
+
+		if (! empty ( $media ) && $showMedia) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $media as $m ) {
 				$opts = array ();
@@ -237,11 +280,12 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			print '<h2>' . $this->getLang ( 'results_media' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
-			print "<p>Precision: $precision m</p>\n";
+			print '<p>Precision: ' . $searchresults ['precision'] . ' m</p>' . DOKU_LF;
 			print '</div>' . DOKU_LF;
 		}
 		print '</div>' . DOKU_LF;
 	}
+
 	/**
 	 * add media to spatial index.
 	 *

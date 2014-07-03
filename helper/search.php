@@ -20,16 +20,14 @@ if (! defined ( 'DOKU_PLUGIN' ))
 	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
 
 /**
- * DokuWiki Plugin spatialhelper (search component).
+ * DokuWiki Plugin spatialhelper (Search component).
  *
  * @license BSD license
  * @author Mark Prins
  */
 class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	/**
-	 * spatial index, well lookup list so we can do spatial queries.
-	 * entries should be:
-	 * array("geohash" => ["id",])
+	 * spatial index.
 	 *
 	 * @var array
 	 */
@@ -61,7 +59,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	protected $geophp;
 
 	/**
-	 * constructor; initialize spatial index.
+	 * constructor; initialize/load spatial index.
 	 */
 	function __construct() {
 		// parent::__construct ();
@@ -156,7 +154,9 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 					] );
 					$media [] = array (
 							'id' => $id,
-							'distance' => ( int ) ($line->greatCircleLength ())
+							'distance' => ( int ) ($line->greatCircleLength ()),
+							'lat' => $point->y (),
+							'lon' => $point->x ()
 					// optionally add other meta such as tag, description...
 										);
 				}
@@ -171,20 +171,29 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 					$pages [] = array (
 							'id' => $id,
 							'distance' => ( int ) ($line->greatCircleLength ()),
-							'description' => p_get_metadata ( $id, 'description' )['abstract']
+							'description' => p_get_metadata ( $id, 'description' )['abstract'],
+							'lat' => $geotags ['lat'],
+							'lon' => $geotags ['lon']
 					// optionally add other meta such as tag...
 										);
 				}
 			}
 		}
-		// TODO sort all the pages using distance?
+
+		// sort all the pages/media using distance
+		usort ( $pages, function ($a, $b) {
+			return strnatcmp ( $a ['distance'], $b ['distance'] );
+		} );
+		usort ( $media, function ($a, $b) {
+			return strnatcmp ( $a ['distance'], $b ['distance'] );
+		} );
 
 		return array (
-				$pages,
-				$media,
-				$decodedPoint->y () . ',' . $decodedPoint->x (),
-				$geohash,
-				$this->precision [strlen ( $geohash )] * 1000
+				'pages' => $pages,
+				'media' => $media,
+				'latlon' => $decodedPoint->y () . ',' . $decodedPoint->x (),
+				'geohash' => $geohash,
+				'precision' => $this->precision [strlen ( $geohash )] * 1000
 		);
 	}
 }
