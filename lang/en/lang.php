@@ -30,3 +30,5 @@ $lang['result_distance_prefix'] = 'Not further than';
 
 $lang['admin_submit'] = 'Purge spatial index';
 $lang['admin_purged_tiles'] = 'Spatial index was purged.';
+
+$lang ['menu'] = 'Spatial index and sitemap manager';

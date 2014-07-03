@@ -16,10 +16,10 @@
  */
 
 /**
- *  configuration metadata.
+ * configuration metadata.
  *
  * @author Mark C. Prins
  * @license BSD license
  */
-$meta['sortkey']        = array('distance','multichoice', '_choices' => array('cdate', 'mdate', 'pagename', 'id', 'title', 'distance'));
-$meta['sortorder']      = array('multichoice', '_choices' => array('ascending', 'descending'));
+$meta ['media_kml'] = array('string');
+$meta ['media_georss'] = array('string');

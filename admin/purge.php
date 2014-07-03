@@ -21,13 +21,13 @@ if (! defined ( 'DOKU_PLUGIN' ))
 require_once DOKU_PLUGIN . 'admin.php';
 /**
  * DokuWiki Plugin spatialhelper (Admin Component).
- * This component purges the spatial index.
+ * This component purges and recreates the spatial index and sitemaps.
  *
  * @author Mark Prins
  */
 class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
+
 	/**
-	 * (non-PHPdoc)
 	 *
 	 * @see DokuWiki_Admin_Plugin::getMenuSort()
 	 */
@@ -35,7 +35,9 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 		return 801;
 	}
 	/**
-	 * (non-PHPdoc)
+	 * admin use only.
+	 *
+	 * @return true
 	 *
 	 * @see DokuWiki_Admin_Plugin::forAdminOnly()
 	 */
@@ -44,7 +46,7 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * purge and regenerate the index and sitemaps.
 	 *
 	 * @see DokuWiki_Admin_Plugin::handle()
 	 */
@@ -59,10 +61,17 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 				}
 			}
 		}
+
+		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+		$indexer->generateSpatialIndex ();
+
+		$sitemapper = plugin_load ( 'helper', 'spatialhelper_sitemap' );
+		$sitemapper->createKMLSitemap ( $this->getConf('media_kml') );
+		$sitemapper->createGeoRSSSitemap ( $this->getConf('media_georss') );
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * render the form for this plugin.
 	 *
 	 * @see DokuWiki_Admin_Plugin::html()
 	 */

@@ -176,6 +176,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		}
 
 		$geometry = $this->getCoordsFromExif ( $img ['id'] );
+		if (!$geometry) {
+			return false;
+		}
 		$geohash = $geometry->out ( 'geohash' );
 		return $this->_addToIndex ( $geohash, 'media__' . $img ['id'] );
 	}

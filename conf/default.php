@@ -21,5 +21,5 @@
  * @author Mark C. Prins
  * @license BSD license
  */
-$conf['sortkey']        = 'distance';  // sort key for topic lists
-$conf['sortorder']      = 'ascending'; // ascending or descending
+$conf ['media_kml'] = ":sitemap.kml";
+$conf ['media_georss'] = ":sitemap.georss";

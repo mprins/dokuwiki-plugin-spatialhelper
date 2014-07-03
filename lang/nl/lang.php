@@ -30,3 +30,5 @@ $lang['result_distance_prefix'] = 'Niet meer dan';
 
 $lang['admin_submit'] = 'Ruimtelijke index wissen.';
 $lang['admin_purged_tiles'] = 'Ruimtelijke index gewist';
+
+$lang ['menu'] = 'Ruimtelijke index en sitemap manager';

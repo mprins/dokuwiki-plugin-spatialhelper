@@ -145,15 +145,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	function handle_sitemap_generate_after(Doku_Event &$event, $param) {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
-		global $conf;
 
 		// dbglog ($event->data['items'], "createSpatialSitemap loading helper" );
-
 		if ($helper = & plugin_load ( 'helper', 'spatialhelper_sitemap' )) {
 			// dbglog ( $helper, "createSpatialSitemap loaded helper." );
 
-			$kml = $helper->createKMLSitemap ( $this->media_kml );
-			$rss = $helper->createGeoRSSSitemap ( $this->media_georss );
+			$kml = $helper->createKMLSitemap ( $this->getConf('media_kml') );
+			$rss = $helper->createGeoRSSSitemap ( $this->getConf('media_georss') );
 
 			return $kml && $rss;
 		} else {

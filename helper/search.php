@@ -135,7 +135,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 				}
 			}
 		}
-		array_unique ( $docIds );
+		$docIds = array_unique ( $docIds );
 		// dbglog ( $docIds, "found docIDs" );
 
 		// create associative array of pages + calculate distance

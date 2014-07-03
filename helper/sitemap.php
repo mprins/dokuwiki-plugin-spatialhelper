@@ -28,6 +28,7 @@ if (! defined ( 'DOKU_LF' ))
  * @author Mark Prins
  */
 class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
+	/** spatial index. */
 	var $spatial_idx = array ();
 
 	/**
@@ -85,8 +86,9 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		// $RSSstart .= '<id></id>'.DOKU_LF;
 		$RSSend = '</feed>' . DOKU_LF;
 
-		// TODO NOTE if $mediaID is namespaced the directory may need to be created, use $conf dmode&fmode
+		io_createNamespace($mediaID, 'media');
 		@touch ( mediaFN ( $mediaID ) );
+		chmod(mediaFN ( $mediaID ), $conf['fmode']);
 		$fh = fopen ( mediaFN ( $mediaID ), 'w' );
 		fwrite ( $fh, $RSSstart );
 
@@ -147,8 +149,10 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 
 		$KMLend = '</Document></kml>' . DOKU_LF;
 
-		// TODO NOTE if $mediaID is namespaced the directory may need to be created
+		io_createNamespace($mediaID, 'media');
 		@touch ( mediaFN ( $mediaID ) );
+		chmod(mediaFN ( $mediaID ), $conf['fmode']);
+
 		$fh = fopen ( mediaFN ( $mediaID ), 'w' );
 		fwrite ( $fh, $KMLstart );
 
