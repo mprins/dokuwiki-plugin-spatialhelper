@@ -30,10 +30,6 @@ require_once (DOKU_PLUGIN . 'action.php');
  */
 class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 
-	// TODO add configurable namespace, NOTE if $mediaID is namespaced the directory may need to be created
-	private $media_kml = ':sitemap.kml';
-	private $media_georss = ':sitemap.georss';
-
 	/**
 	 * Register for events.
 	 *
@@ -128,9 +124,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param unknown $param
 	 */
 	function handle_sitemap_generate_before(Doku_Event &$event, $param) {
-		$path = mediaFN ( $this->media_kml );
+		$path = mediaFN ( $this->getConf('media_kml') );
 		$lastmod = @filemtime ( $path );
-		$event->data ['items'] [] = new SitemapItem ( ml ( $this->media_kml, '', true, '&amp;', true ), $lastmod );
+		$event->data ['items'] [] = new SitemapItem ( ml ( $this->getConf('media_kml'), '', true, '&amp;', true ), $lastmod );
 		// dbglog ( $event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages." );
 	}
 
@@ -346,13 +342,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		$event->data ["link"] [] = array (
 				"type" => "application/atom+xml",
 				"rel" => "alternate",
-				"href" => ml ( $this->media_georss ),
+				"href" => ml ( $this->getConf('media_georss') ),
 				"title" => "Spatial ATOM Feed"
 		);
 		$event->data ["link"] [] = array (
 				"type" => "application/vnd.google-earth.kml+xml",
 				"rel" => "alternate",
-				"href" => ml ( $this->media_kml ),
+				"href" => ml ( $this->getConf('media_kml') ),
 				"title" => "KML Sitemap"
 		);
 	}
