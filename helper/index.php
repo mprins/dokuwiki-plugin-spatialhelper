@@ -75,9 +75,8 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 */
 	function updateSpatialIndex($id) {
 		$geotags = p_get_metadata ( $id, 'geo' );
-		if (empty ( $geotags )) {
-			return true;
-		}
+		if (empty ( $geotags )) return false;
+		if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) return false;
 		// dbglog ( $geotags, "Geo metadata found for page $id" );
 		$geometry = new Point ( $geotags ['lon'], $geotags ['lat'] );
 		$geohash = $geometry->out ( 'geohash' );
