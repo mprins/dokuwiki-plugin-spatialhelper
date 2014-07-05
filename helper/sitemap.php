@@ -76,14 +76,20 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	function createGeoRSSSitemap($mediaID) {
 		global $conf;
 
+		$idTag = 'tag:'. parse_url( DOKU_URL, PHP_URL_HOST ) .',';
+
 		$RSSstart = '<?xml version="1.0" encoding="utf-8"?>' . DOKU_LF;
 		$RSSstart = '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss">' . DOKU_LF;
 		$RSSstart .= '<title>' . $conf ['title'] . ' spatial feed</title>' . DOKU_LF;
-		$RSSstart .= '<subtitle>' . $conf ['tagline'] . '</subtitle>' . DOKU_LF;
+		if (!empty($conf ['tagline'])) {
+			$RSSstart .= '<subtitle>' . $conf ['tagline'] . '</subtitle>' . DOKU_LF;
+		}
 		$RSSstart .= '<link href="' . DOKU_URL . '" />' . DOKU_LF;
 		$RSSstart .= '<link href="' . ml ( $mediaID, '', true, '&amp;', true ) . '" rel="self" />' . DOKU_LF;
 		$RSSstart .= '<updated>' . date ( DATE_ATOM ) . '</updated>' . DOKU_LF;
-		// $RSSstart .= '<id></id>'.DOKU_LF;
+		$RSSstart .= '<id>' . $idTag . date("Y-m-d") . ':' . parse_url( ml( $mediaID ), PHP_URL_PATH) . '</id>'.DOKU_LF;
+		$RSSstart .= '<rights>' . $conf ['license'] . '</rights>'.DOKU_LF;
+
 		$RSSend = '</feed>' . DOKU_LF;
 
 		io_createNamespace($mediaID, 'media');
@@ -115,10 +121,14 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 					if ($meta ['geo'] ['alt']) {
 						$entry .= '  <georss:elev>' . $meta ['geo'] ['alt'] . '</georss:elev>' . DOKU_LF;
 					}
-					$entry .= '  <link href="' . wl ( $id ) . '" />' . DOKU_LF;
-					$entry .= '  <author><name>' . $meta ['user'] . '</name></author>' . DOKU_LF;
+					$entry .= '  <link href="' . wl ( $id ) . '" rel="alternate" type="text/html" />' . DOKU_LF;
+					if (empty( $meta ['creator'] ) ) {
+						$meta ['creator'] = $conf['title'];
+					}
+					$entry .= '  <author><name>' . $meta ['creator'] . '</name></author>' . DOKU_LF;
 					$entry .= '  <updated>' . date_iso8601($meta ['date'] ['modified']) . '</updated>' . DOKU_LF;
-					$entry .= '  <id>' . $id . '</id>' . DOKU_LF;
+					$entry .= '  <published>' . date_iso8601($meta ['date'] ['created']) . '</published>' . DOKU_LF;
+					$entry .= '  <id>' . $idTag . date("Y-m-d", $meta ['date'] ['modified']) . ':' . parse_url( wl( $id ), PHP_URL_PATH) . '</id>' . DOKU_LF;
 					$entry .= '</entry>' . DOKU_LF;
 					fwrite ( $fh, $entry );
 				}
@@ -174,7 +184,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 					$desc .= '<p><a href="' . wl ( $id, '', true ) . '">' . $meta ['title'] . '</a></p>';
 
 					// create an entry and store it
-					$plcm = '<Placemark>' . DOKU_LF;
+					$plcm = '<Placemark id="' . hash ( 'crc32', $id ) . '">' . DOKU_LF;
 					$plcm .= '  <name>' . $meta ['title'] . '</name>' . DOKU_LF;
 					$plcm .= '  <description><![CDATA[' . $desc . ']]></description>' . DOKU_LF;
 					$plcm .= '  <Point><coordinates>' . $meta ['geo'] ['lon'] . ',' . $meta ['geo'] ['lat'];
@@ -183,8 +193,9 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 					}
 					$plcm .= '</coordinates></Point>' . DOKU_LF;
 					$plcm .= '  <atom:link href="' . wl ( $id, '' . true ) . '" />' . DOKU_LF;
-					$plcm .= '  <atom:author><atom:name>' . $meta ['user'] . '</atom:name></atom:author>' . DOKU_LF;
-					$plcm .= '  <atom:updated>' . date_iso8601($meta ['date'] ['modified']) . '</atom:updated>' . DOKU_LF;
+					if (! empty( $meta ['creator'] ) ) {
+						$entry .= '  <atom:author><atom:name>' . $meta ['creator'] . '</atom:name></atom:author>' . DOKU_LF;
+					}
 					$plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
 					$plcm .= '</Placemark>' . DOKU_LF;
 
