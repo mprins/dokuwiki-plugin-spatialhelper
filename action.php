@@ -175,8 +175,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *
 	 * @param Doku_Event $event
 	 *        	event object by reference
-	 * @param mixed $param
-	 *        	'format'=>
+	 * @param mixed $param associative array with keys
+	 *        	'format'=> HTML | JSON
 	 */
 	function _findnearby(Doku_Event &$event, $param) {
 		if ($event->data != 'findnearby')
@@ -259,15 +259,15 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		} else {
 			print '<p>' . hsc ( $this->getLang ( 'nothingfound' ) ) . '</p>';
 		}
-
+		// TODO $dist_prefix from lang file
 		if (! empty ( $media ) && $showMedia) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $media as $m ) {
 				$opts = array ();
 				$link = ml ( $m ['id'], $opts, false, '&amp;', false );
-				$opts ['w'] = '100px';
+				$opts ['w'] = '100';
 				$src = ml ( $m ['id'], $opts );
-				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) </li>' . DOKU_LF;
+				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) ' . hsc($desc) . '</li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
