@@ -49,7 +49,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 			610,
 			118,
 			19,
-			3.71,
+			3.7,
 			0.6
 	);
 
@@ -193,7 +193,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 				'media' => $media,
 				'latlon' => $decodedPoint->y () . ',' . $decodedPoint->x (),
 				'geohash' => $geohash,
-				'precision' => $this->precision [strlen ( $geohash )] * 1000
+				'precision' => $this->precision [strlen ( $geohash )]
 		);
 	}
 }

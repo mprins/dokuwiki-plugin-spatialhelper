@@ -179,6 +179,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			return false;
 		}
 		$geohash = $geometry->out ( 'geohash' );
+		// TODO truncate the geohash to something reasonable, otherwise they are 
+		// useless as an indexing mechanism eg. u1h73weckdrmskdqec3c9 is far too 
+		// precise, limit at ~9 as most GPS are not submeter accurate
 		return $this->_addToIndex ( $geohash, 'media__' . $img ['id'] );
 	}
 
@@ -199,14 +202,14 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 				$exif ['GPS'] ['GPSLatitude'] [0],
 				$exif ['GPS'] ['GPSLatitude'] [1],
 				$exif ['GPS'] ['GPSLatitude'] [2],
-				$exif ["GPS"] ["GPSLatitudeRef"]
+				$exif ['GPS'] ['GPSLatitudeRef']
 		) );
 
 		$lon = $this->_convertDMStoD ( array (
 				$exif ['GPS'] ['GPSLongitude'] [0],
 				$exif ['GPS'] ['GPSLongitude'] [1],
 				$exif ['GPS'] ['GPSLongitude'] [2],
-				$exif ["GPS"] ["GPSLongitudeRef"]
+				$exif ['GPS'] ['GPSLongitudeRef']
 		) );
 
 		return new Point ( $lon, $lat );
