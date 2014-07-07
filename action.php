@@ -124,9 +124,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param unknown $param
 	 */
 	function handle_sitemap_generate_before(Doku_Event &$event, $param) {
-		$path = mediaFN ( $this->getConf('media_kml') );
+		$path = mediaFN ( $this->getConf ( 'media_kml' ) );
 		$lastmod = @filemtime ( $path );
-		$event->data ['items'] [] = new SitemapItem ( ml ( $this->getConf('media_kml'), '', true, '&amp;', true ), $lastmod );
+		$event->data ['items'] [] = new SitemapItem ( ml ( $this->getConf ( 'media_kml' ), '', true, '&amp;', true ), $lastmod );
 		// dbglog ( $event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages." );
 	}
 
@@ -146,8 +146,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		if ($helper = & plugin_load ( 'helper', 'spatialhelper_sitemap' )) {
 			// dbglog ( $helper, "createSpatialSitemap loaded helper." );
 
-			$kml = $helper->createKMLSitemap ( $this->getConf('media_kml') );
-			$rss = $helper->createGeoRSSSitemap ( $this->getConf('media_georss') );
+			$kml = $helper->createKMLSitemap ( $this->getConf ( 'media_kml' ) );
+			$rss = $helper->createGeoRSSSitemap ( $this->getConf ( 'media_georss' ) );
 
 			return $kml && $rss;
 		} else {
@@ -175,7 +175,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *
 	 * @param Doku_Event $event
 	 *        	event object by reference
-	 * @param mixed $param associative array with keys
+	 * @param mixed $param
+	 *        	associative array with keys
 	 *        	'format'=> HTML | JSON
 	 */
 	function _findnearby(Doku_Event &$event, $param) {
@@ -247,7 +248,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		if (! empty ( $pages )) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $pages as $page ) {
-				$pagelist .= '<li>' . html_wikilink ( ':' . $page ['id'], useHeading ( 'navigation' ) ? null : noNS ( $page ['id'] ) ) . ' (' . $dist_prefix . $page ['distance'] . 'm) ' . $page ['description'] . '</li>' . DOKU_LF;
+				$pagelist .= '<li>' . html_wikilink ( ':' . $page ['id'], useHeading ( 'navigation' ) ? null : noNS ( $page ['id'] ) ) . ' (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . 'm) ' . $page ['description'] . '</li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
@@ -259,7 +260,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		} else {
 			print '<p>' . hsc ( $this->getLang ( 'nothingfound' ) ) . '</p>';
 		}
-		// TODO $dist_prefix from lang file
+
 		if (! empty ( $media ) && $showMedia) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $media as $m ) {
@@ -267,7 +268,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				$link = ml ( $m ['id'], $opts, false, '&amp;', false );
 				$opts ['w'] = '100';
 				$src = ml ( $m ['id'], $opts );
-				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $dist_prefix . $page ['distance'] . 'm) ' . hsc($desc) . '</li>' . DOKU_LF;
+				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . 'm) ' . hsc ( $desc ) . '</li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
@@ -342,13 +343,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		$event->data ["link"] [] = array (
 				"type" => "application/atom+xml",
 				"rel" => "alternate",
-				"href" => ml ( $this->getConf('media_georss') ),
+				"href" => ml ( $this->getConf ( 'media_georss' ) ),
 				"title" => "Spatial ATOM Feed"
 		);
 		$event->data ["link"] [] = array (
 				"type" => "application/vnd.google-earth.kml+xml",
 				"rel" => "alternate",
-				"href" => ml ( $this->getConf('media_kml') ),
+				"href" => ml ( $this->getConf ( 'media_kml' ) ),
 				"title" => "KML Sitemap"
 		);
 	}

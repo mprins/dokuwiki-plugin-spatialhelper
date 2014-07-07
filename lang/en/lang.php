@@ -21,14 +21,14 @@
  * @author mark
  * @license BSD license
  */
-$lang['nothingfound'] = 'Nothing found.';
-$lang['invalidinput'] = 'No valid input was given.';
-$lang['results_header'] = 'Searchresults';
-$lang['results_pages'] = 'Pages nearby';
-$lang['results_media'] = 'Media nearby';
-$lang['result_distance_prefix'] = 'Not further than';
+$lang ['nothingfound'] = 'Nothing found.';
+$lang ['invalidinput'] = 'No valid input was given.';
+$lang ['results_header'] = 'Searchresults';
+$lang ['results_pages'] = 'Pages nearby';
+$lang ['results_media'] = 'Media nearby';
+$lang ['results_distance_prefix'] = 'Beeline distance: ';
 
-$lang['admin_submit'] = 'Purge spatial index';
-$lang['admin_purged_tiles'] = 'Spatial index was purged.';
+$lang ['admin_submit'] = 'Purge spatial index';
+$lang ['admin_purged_tiles'] = 'Spatial index was purged.';
 
 $lang ['menu'] = 'Spatial index and sitemap manager';
