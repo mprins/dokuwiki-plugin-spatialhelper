@@ -1,6 +1,5 @@
-<?php
 /*
- * Copyright (c) 2011-2014 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,23 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/**
- * English language file for spatialhelper plugin.
- *
- * @author mark
- * @license BSD license
- */
-$lang ['nothingfound'] = 'Nothing found.';
-$lang ['invalidinput'] = 'No valid input was given.';
-
-$lang ['search_findnearby'] = 'Search pages and media nearby';
-
-$lang ['results_header'] = 'Searchresults';
-$lang ['results_pages'] = 'Pages nearby';
-$lang ['results_media'] = 'Media nearby';
-$lang ['results_distance_prefix'] = 'Beeline distance: ';
-
-$lang ['admin_submit'] = 'Purge spatial index';
-$lang ['admin_purged_tiles'] = 'Spatial index was purged.';
-
-$lang ['menu'] = 'Spatial index and sitemap manager';
+.findnearby {
+	background: transparent url(findnearby.png) 0px 1px no-repeat;
+	padding: 1px 0px 1px 18px;
+}

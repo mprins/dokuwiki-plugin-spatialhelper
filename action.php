@@ -185,13 +185,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		$event->preventDefault ();
 
 		global $INPUT;
-		$dist_prefix = '';
 		if ($helper = & plugin_load ( 'helper', 'spatialhelper_search' )) {
-			if ($INPUT->has ( 'geohash' )) {
-				$results = $helper->findNearby ( $INPUT->str ( 'geohash' ) );
-				$dist_prefix = hsc ( $this->getLang ( 'result_distance_prefix' ) ) . ' ';
-			} elseif ($INPUT->has ( 'lat' ) && $INPUT->has ( 'lon' )) {
+			if ($INPUT->has ( 'lat' ) && $INPUT->has ( 'lon' )) {
 				$results = $helper->findNearbyLatLon ( $INPUT->param ( 'lat' ), $INPUT->param ( 'lon' ) );
+			} elseif ($INPUT->has ( 'geohash' )) {
+				$results = $helper->findNearby ( $INPUT->str ( 'geohash' ) );
 			} else {
 				$results = array (
 						'error' => hsc ( $this->getLang ( 'invalidinput' ) )
@@ -220,7 +218,6 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	private function printJSON($searchresults) {
 		require_once DOKU_INC . 'inc/JSON.php';
 		$json = new JSON ();
-
 		header ( 'Content-Type: application/json' );
 		print $json->encode ( $searchresults );
 	}
