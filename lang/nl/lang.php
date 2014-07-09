@@ -25,11 +25,13 @@ $lang ['nothingfound'] = 'Niets gevonden.';
 $lang ['invalidinput'] = 'Geen geldige invoer gegeven.';
 
 $lang ['search_findnearby'] = 'Zoek pagina\'s en media in de buurt';
+$lang ['search_largerarea'] = 'Zoek in een groter gebied';
 
 $lang ['results_header'] = 'Zoekresultaten';
 $lang ['results_pages'] = 'Pagina\'s in de buurt';
 $lang ['results_media'] = 'Media in de buurt';
-$lang ['results_distance_prefix'] = 'Afstand hemelsbreed: ';
+$lang ['results_distance_prefix'] = 'Afstand hemelsbreed:&nbsp;';
+$lang ['results_precision'] = 'Nauwkeurigheid:&nbsp;';
 
 $lang ['admin_submit'] = 'Ruimtelijke index wissen.';
 $lang ['admin_purged_tiles'] = 'Ruimtelijke index gewist';

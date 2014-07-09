@@ -231,7 +231,8 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	private function printHTML($searchresults, $showMedia = true) {
 		$pages = ( array ) ($searchresults ['pages']);
 		$media = ( array ) $searchresults ['media'];
-		$location = ( string ) $searchresults ['latlon'];
+		$lat = ( float ) $searchresults ['lat'];
+		$lon = ( float ) $searchresults ['lon'];
 		$geohash = ( string ) $searchresults ['geohash'];
 
 		if (isset ( $searchresults ['error'] )) {
@@ -245,14 +246,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		if (! empty ( $pages )) {
 			$pagelist = '<ol>' . DOKU_LF;
 			foreach ( $pages as $page ) {
-				$pagelist .= '<li>' . html_wikilink ( ':' . $page ['id'], useHeading ( 'navigation' ) ? null : noNS ( $page ['id'] ) ) . ' (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . 'm) ' . $page ['description'] . '</li>' . DOKU_LF;
+				$pagelist .= '<li>' . html_wikilink ( ':' . $page ['id'], useHeading ( 'navigation' ) ? null : noNS ( $page ['id'] ) ) . ' (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . '&nbsp;m) ' . $page ['description'] . '</li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
-			print '<h2>' . $this->getLang ( 'results_pages' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>';
+			print '<h2>' . $this->getLang ( 'results_pages' ) . hsc ( ' lat;lon: ' . $lat . ';' . $lon . ' (geohash: ' . $geohash . ')' ) . '</h2>';
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
-			print '<p>Precision: ' . $searchresults ['precision'] . ' m</p>' . DOKU_LF;
 			print '</div>' . DOKU_LF;
 		} else {
 			print '<p>' . hsc ( $this->getLang ( 'nothingfound' ) ) . '</p>';
@@ -265,15 +265,23 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				$link = ml ( $m ['id'], $opts, false, '&amp;', false );
 				$opts ['w'] = '100';
 				$src = ml ( $m ['id'], $opts );
-				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . 'm) ' . hsc ( $desc ) . '</li>' . DOKU_LF;
+				$pagelist .= '<li><a href="' . $link . '"><img src="' . $src . '"></a> (' . $this->getLang ( 'results_distance_prefix' ) . $page ['distance'] . '&nbsp;m) ' . hsc ( $desc ) . '</li>' . DOKU_LF;
 			}
 			$pagelist .= '</ol>' . DOKU_LF;
 
-			print '<h2>' . $this->getLang ( 'results_media' ) . hsc ( ' lat,lon: ' . $location . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
+			print '<h2>' . $this->getLang ( 'results_media' ) . hsc ( ' lat;lon: ' . $lat . ';' . $lon . ' (geohash: ' . $geohash . ')' ) . '</h2>' . DOKU_LF;
 			print '<div class="level2">' . DOKU_LF;
 			print $pagelist;
-			print '<p>Precision: ' . $searchresults ['precision'] . ' m</p>' . DOKU_LF;
 			print '</div>' . DOKU_LF;
+		}
+		print '<p>' . $this->getLang ( 'results_precision' ) . $searchresults ['precision'] . ' m. ';
+		if ( strlen ( $geohash ) > 1 ) {
+			$url = wl( getID() , array(
+									'do' => 'findnearby',
+									'geohash' => substr( $geohash, 0, -1)
+									)
+					);
+			print '<a href="' . $url . '" class="findnearby">' . $this->getLang('search_largerarea') . '</a>.</p>'. DOKU_LF;
 		}
 		print '</div>' . DOKU_LF;
 	}

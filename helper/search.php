@@ -191,7 +191,8 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		return array (
 				'pages' => $pages,
 				'media' => $media,
-				'latlon' => $decodedPoint->y () . ',' . $decodedPoint->x (),
+				'lat' => $decodedPoint->y (),
+				'lon' => $decodedPoint->x (),
 				'geohash' => $geohash,
 				'precision' => $this->precision [strlen ( $geohash )]
 		);
