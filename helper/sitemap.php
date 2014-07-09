@@ -111,7 +111,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 
 					$meta = p_get_metadata ( $id );
 
-					// $desc = p_render ( 'xhtml', p_get_instructions($meta ['description'] ['abstract']), $info );
+					// $desc = p_render ( 'xhtmlsummary', p_get_instructions($meta ['description'] ['abstract']), $info );
 					$desc = strip_tags ( $meta ['description'] ['abstract'] );
 
 					$entry = '<entry>' . DOKU_LF;
@@ -179,7 +179,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 
 					$meta = p_get_metadata ( $id );
 
-					// $desc = p_render ( 'xhtml', p_get_instructions($meta ['description'] ['abstract']), $info );
+					//$desc = p_render ( 'xhtmlsummary', p_get_instructions($meta ['description'] ['abstract']), $info );
 					$desc = '<p>' . strip_tags ( $meta ['description'] ['abstract'] ) . '</p>';
 					$desc .= '<p><a href="' . wl ( $id, '', true ) . '">' . $meta ['title'] . '</a></p>';
 

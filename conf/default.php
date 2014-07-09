@@ -21,5 +21,5 @@
  * @author Mark C. Prins
  * @license BSD license
  */
-$conf ['media_kml'] = ":sitemap.kml";
-$conf ['media_georss'] = ":sitemap.georss";
+$conf['media_kml'] = ":sitemap.kml";
+$conf['media_georss'] = ":sitemap.georss";
