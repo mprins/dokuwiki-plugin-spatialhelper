@@ -49,10 +49,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		
 		// handle actions we know of
 		$controller->register_hook ( 'ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handle_action_act_preprocess', array () );
+		// handle HTML eg. /dokuwiki/doku.php?id=start&do=findnearby&geohash=u15vk4
 		$controller->register_hook ( 'TPL_ACT_UNKNOWN', 'BEFORE', $this, '_findnearby', array (
 				'format' => 'HTML' 
 		) );
-		
+		// handles AJAX/json eg: jQuery.post("/dokuwiki/lib/exe/ajax.php?id=start&call=findnearby&geohash=u15vk4");
 		$controller->register_hook ( 'AJAX_CALL_UNKNOWN', 'BEFORE', $this, '_findnearby', array (
 				'format' => 'JSON' 
 		) );
@@ -199,7 +200,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		
 		$showMedia = $INPUT->bool ( 'showMedia', true );
 		
-		switch (strtoupper ( $INPUT->str ( 'format' ) )) {
+		switch ( $param[ 'format' ] ) {
 			case 'JSON' :
 				$this->printJSON ( $results );
 				break;
@@ -210,7 +211,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Print seachresults as HTML lists.
 	 *
@@ -222,7 +223,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		header ( 'Content-Type: application/json' );
 		print $json->encode ( $searchresults );
 	}
-	
+
 	/**
 	 * Print seachresults as HTML lists.
 	 *
@@ -285,7 +286,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		}
 		print '</div>' . DOKU_LF;
 	}
-	
+
 	/**
 	 * add media to spatial index.
 	 *
@@ -314,7 +315,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// TODO add image/tiff
 		// TODO kml, gpx, geojson...
 	}
-	
+
 	/**
 	 * removes the media from the index.
 	 */
@@ -332,7 +333,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			$indexer->deleteFromIndex ( 'media__' . $event->data ['id'] );
 		}
 	}
-	
+
 	/**
 	 * add a link to the spatial sitemap files in the header.
 	 *
@@ -358,7 +359,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 				"title" => "KML Sitemap" 
 		);
 	}
-	
+
 	/**
 	 * Calculate a new coordinate based on start, distance and bearing
 	 *

@@ -78,8 +78,8 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 
 		$idTag = 'tag:'. parse_url( DOKU_URL, PHP_URL_HOST ) .',';
 
-		$RSSstart = '<?xml version="1.0" encoding="utf-8"?>' . DOKU_LF;
-		$RSSstart = '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss">' . DOKU_LF;
+		$RSSstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
+		$RSSstart .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss">' . DOKU_LF;
 		$RSSstart .= '<title>' . $conf ['title'] . ' spatial feed</title>' . DOKU_LF;
 		if (!empty($conf ['tagline'])) {
 			$RSSstart .= '<subtitle>' . $conf ['tagline'] . '</subtitle>' . DOKU_LF;
