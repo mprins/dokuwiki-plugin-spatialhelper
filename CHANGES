@@ -2,6 +2,7 @@
 
 === version ${project.version} ===
   * various bugfixes
+  * generate valid KML 2.2
   
 
 === version 0.1 ===
