@@ -28,9 +28,11 @@ if (! defined ( 'DOKU_LF' ))
  * @author Mark Prins
  */
 class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
-	/** spatial index. */
+	/**
+	 * spatial index.
+	 */
 	var $spatial_idx = array ();
-
+	
 	/**
 	 * constructor, load spatial index.
 	 */
@@ -49,24 +51,24 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 				'name' => 'createGeoRSSSitemap',
 				'desc' => 'create a spatial sitemap in GeoRSS format.',
 				'params' => array (
-						'path' => 'string'
+						'path' => 'string' 
 				),
 				'return' => array (
-						'success' => 'boolean'
-				)
+						'success' => 'boolean' 
+				) 
 		);
 		$result [] = array (
 				'name' => 'createKMLSitemap',
 				'desc' => 'create a spatial sitemap in KML format.',
 				'params' => array (
-						'path' => 'string'
+						'path' => 'string' 
 				),
 				'return' => array (
-						'success' => 'boolean'
-				)
+						'success' => 'boolean' 
+				) 
 		);
 	}
-
+	
 	/**
 	 * Create a GeoRSS Simple sitemap.
 	 *
@@ -75,29 +77,29 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 */
 	function createGeoRSSSitemap($mediaID) {
 		global $conf;
-
-		$idTag = 'tag:'. parse_url( DOKU_URL, PHP_URL_HOST ) .',';
-
+		
+		$idTag = 'tag:' . parse_url ( DOKU_URL, PHP_URL_HOST ) . ',';
+		
 		$RSSstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
 		$RSSstart .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss">' . DOKU_LF;
 		$RSSstart .= '<title>' . $conf ['title'] . ' spatial feed</title>' . DOKU_LF;
-		if (!empty($conf ['tagline'])) {
+		if (! empty ( $conf ['tagline'] )) {
 			$RSSstart .= '<subtitle>' . $conf ['tagline'] . '</subtitle>' . DOKU_LF;
 		}
 		$RSSstart .= '<link href="' . DOKU_URL . '" />' . DOKU_LF;
 		$RSSstart .= '<link href="' . ml ( $mediaID, '', true, '&amp;', true ) . '" rel="self" />' . DOKU_LF;
 		$RSSstart .= '<updated>' . date ( DATE_ATOM ) . '</updated>' . DOKU_LF;
-		$RSSstart .= '<id>' . $idTag . date("Y-m-d") . ':' . parse_url( ml( $mediaID ), PHP_URL_PATH) . '</id>'.DOKU_LF;
-		$RSSstart .= '<rights>' . $conf ['license'] . '</rights>'.DOKU_LF;
-
+		$RSSstart .= '<id>' . $idTag . date ( "Y-m-d" ) . ':' . parse_url ( ml ( $mediaID ), PHP_URL_PATH ) . '</id>' . DOKU_LF;
+		$RSSstart .= '<rights>' . $conf ['license'] . '</rights>' . DOKU_LF;
+		
 		$RSSend = '</feed>' . DOKU_LF;
-
-		io_createNamespace($mediaID, 'media');
+		
+		io_createNamespace ( $mediaID, 'media' );
 		@touch ( mediaFN ( $mediaID ) );
-		chmod(mediaFN ( $mediaID ), $conf['fmode']);
+		chmod ( mediaFN ( $mediaID ), $conf ['fmode'] );
 		$fh = fopen ( mediaFN ( $mediaID ), 'w' );
 		fwrite ( $fh, $RSSstart );
-
+		
 		foreach ( $this->spatial_idx as $idxEntry ) {
 			// get list of id's
 			foreach ( $idxEntry as $id ) {
@@ -108,12 +110,12 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 						continue;
 					if (auth_aclcheck ( $id, '', '' ) < AUTH_READ)
 						continue;
-
+					
 					$meta = p_get_metadata ( $id );
-
+					
 					// $desc = p_render ( 'xhtmlsummary', p_get_instructions($meta ['description'] ['abstract']), $info );
 					$desc = strip_tags ( $meta ['description'] ['abstract'] );
-
+					
 					$entry = '<entry>' . DOKU_LF;
 					$entry .= '  <title>' . $meta ['title'] . '</title>' . DOKU_LF;
 					$entry .= '  <summary>' . $desc . '</summary>' . DOKU_LF;
@@ -122,23 +124,23 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 						$entry .= '  <georss:elev>' . $meta ['geo'] ['alt'] . '</georss:elev>' . DOKU_LF;
 					}
 					$entry .= '  <link href="' . wl ( $id ) . '" rel="alternate" type="text/html" />' . DOKU_LF;
-					if (empty( $meta ['creator'] ) ) {
-						$meta ['creator'] = $conf['title'];
+					if (empty ( $meta ['creator'] )) {
+						$meta ['creator'] = $conf ['title'];
 					}
 					$entry .= '  <author><name>' . $meta ['creator'] . '</name></author>' . DOKU_LF;
-					$entry .= '  <updated>' . date_iso8601($meta ['date'] ['modified']) . '</updated>' . DOKU_LF;
-					$entry .= '  <published>' . date_iso8601($meta ['date'] ['created']) . '</published>' . DOKU_LF;
-					$entry .= '  <id>' . $idTag . date("Y-m-d", $meta ['date'] ['modified']) . ':' . parse_url( wl( $id ), PHP_URL_PATH) . '</id>' . DOKU_LF;
+					$entry .= '  <updated>' . date_iso8601 ( $meta ['date'] ['modified'] ) . '</updated>' . DOKU_LF;
+					$entry .= '  <published>' . date_iso8601 ( $meta ['date'] ['created'] ) . '</published>' . DOKU_LF;
+					$entry .= '  <id>' . $idTag . date ( "Y-m-d", $meta ['date'] ['modified'] ) . ':' . parse_url ( wl ( $id ), PHP_URL_PATH ) . '</id>' . DOKU_LF;
 					$entry .= '</entry>' . DOKU_LF;
 					fwrite ( $fh, $entry );
 				}
 			}
 		}
-
+		
 		fwrite ( $fh, $RSSend );
 		return fclose ( $fh );
 	}
-
+	
 	/**
 	 * Create a KML sitemap.
 	 *
@@ -147,25 +149,26 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 */
 	function createKMLSitemap($mediaID) {
 		global $conf;
-
+		
 		$KMLstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
-		// schemaLocation="http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd"
-		$KMLstart .= '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom"><Document>' . DOKU_LF;
+		$KMLstart .= '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:atom="http://www.w3.org/2005/Atom"';
+		$KMLstart .= ' xsi:schemaLocation="http://www.opengis.net/kml/2.2 http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd">' . DOKU_LF;
+		$KMLstart .= '<Document id="root_doc">' . DOKU_LF;
 		$KMLstart .= '<name>' . $conf ['title'] . ' spatial sitemap</name>' . DOKU_LF;
-		$KMLstart .= '<atom:link rel="related" href="' . DOKU_URL . '" />' . DOKU_LF;
-		$RSSstart .= '<atom:updated>' . date ( DATE_ATOM ) . '</atom:updated>' . DOKU_LF;
+		$KMLstart .= '<atom:link href="' . DOKU_URL . '" rel="related" type="text/html" />' . DOKU_LF;
+		$KMLstart .= '<!-- atom:updated>' . date ( DATE_ATOM ) . '</atom:updated -->' . DOKU_LF;
 		$KMLstart .= '<Style id="icon"><IconStyle><color>ffffffff</color><scale>1</scale>';
 		$KMLstart .= '<Icon><href>' . DOKU_BASE . 'lib/plugins/spatialhelper/wikiitem.png</href></Icon></IconStyle></Style>' . DOKU_LF;
-
-		$KMLend = '</Document></kml>' . DOKU_LF;
-
-		io_createNamespace($mediaID, 'media');
+		
+		$KMLend = '</Document>' . DOKU_LF . '</kml>';
+		
+		io_createNamespace ( $mediaID, 'media' );
 		@touch ( mediaFN ( $mediaID ) );
-		chmod(mediaFN ( $mediaID ), $conf['fmode']);
-
+		chmod ( mediaFN ( $mediaID ), $conf ['fmode'] );
+		
 		$fh = fopen ( mediaFN ( $mediaID ), 'w' );
 		fwrite ( $fh, $KMLstart );
-
+		
 		foreach ( $this->spatial_idx as $idxEntry ) {
 			// get list of id's
 			foreach ( $idxEntry as $id ) {
@@ -176,29 +179,32 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 						continue;
 					if (auth_aclcheck ( $id, '', '' ) < AUTH_READ)
 						continue;
-
+					
 					$meta = p_get_metadata ( $id );
-
-					//$desc = p_render ( 'xhtmlsummary', p_get_instructions($meta ['description'] ['abstract']), $info );
+					
+					// $desc = p_render ( 'xhtmlsummary', p_get_instructions($meta ['description'] ['abstract']), $info );
 					$desc = '<p>' . strip_tags ( $meta ['description'] ['abstract'] ) . '</p>';
 					$desc .= '<p><a href="' . wl ( $id, '', true ) . '">' . $meta ['title'] . '</a></p>';
-
+					
 					// create an entry and store it
-					$plcm = '<Placemark id="' . hash ( 'crc32', $id ) . '">' . DOKU_LF;
+					$plcm = '<Placemark id="crc32-' . hash ( 'crc32', $id ) . '">' . DOKU_LF;
 					$plcm .= '  <name>' . $meta ['title'] . '</name>' . DOKU_LF;
+					// TODO escape quotes in: title="' . $meta ['title'] . '"
+					$plcm .= '  <atom:link href="' . wl ( $id, '' . true ) . '" rel="alternate" type="text/html" />' . DOKU_LF;
+					if (! empty ( $meta ['creator'] )) {
+						$entry .= '  <atom:author><atom:name>' . $meta ['creator'] . '</atom:name></atom:author>' . DOKU_LF;
+					}
+					
 					$plcm .= '  <description><![CDATA[' . $desc . ']]></description>' . DOKU_LF;
+					$plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
+					
 					$plcm .= '  <Point><coordinates>' . $meta ['geo'] ['lon'] . ',' . $meta ['geo'] ['lat'];
 					if ($meta ['geo'] ['alt']) {
 						$plcm .= ',' . $meta ['geo'] ['alt'];
 					}
 					$plcm .= '</coordinates></Point>' . DOKU_LF;
-					$plcm .= '  <atom:link href="' . wl ( $id, '' . true ) . '" />' . DOKU_LF;
-					if (! empty( $meta ['creator'] ) ) {
-						$entry .= '  <atom:author><atom:name>' . $meta ['creator'] . '</atom:name></atom:author>' . DOKU_LF;
-					}
-					$plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
 					$plcm .= '</Placemark>' . DOKU_LF;
-
+					
 					fwrite ( $fh, $plcm );
 				}
 			}
