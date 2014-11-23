@@ -1,9 +1,11 @@
 ==== Changes ====
 
 === version ${project.version} ===
+  *
+
+=== version 0.2 ===
   * various bugfixes
   * generate valid KML 2.2
-  
 
 === version 0.1 ===
   * initial release
