@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2014 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2015 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -179,8 +179,8 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			return false;
 		}
 		$geohash = $geometry->out ( 'geohash' );
-		// TODO truncate the geohash to something reasonable, otherwise they are 
-		// useless as an indexing mechanism eg. u1h73weckdrmskdqec3c9 is far too 
+		// TODO truncate the geohash to something reasonable, otherwise they are
+		// useless as an indexing mechanism eg. u1h73weckdrmskdqec3c9 is far too
 		// precise, limit at ~9 as most GPS are not submeter accurate
 		return $this->_addToIndex ( $geohash, 'media__' . $img ['id'] );
 	}
@@ -273,10 +273,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @return number
 	 */
 	private function _convertDMStoD($param) {
-		if (! is_array ( $param ))
-			$param = array (
-					$param
-			);
+		if (!is_array($param)){
+			$param = array ($param);
+		}
 		$deg = $this->_convertRationaltoFloat ( $param [0] );
 		$min = $this->_convertRationaltoFloat ( $param [1] ) / 60;
 		$sec = $this->_convertRationaltoFloat ( $param [2] ) / 60 / 60;
@@ -284,9 +283,14 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$hem = $param [4] == ('N' | 'E') ? - 1 : 1;
 		return $hem * $deg + $min + $sec;
 	}
+
 	private function _convertRationaltoFloat($param) {
 		// rational64u
-		$nums = explode ( '/', $param );
-		return intval ( $nums [0] ) / intval ( $nums [1] );
+		$nums = explode('/', $param);
+		if (intval ($nums[1]) > 0 ){
+			return intval($nums[0]) / intval($nums[1]);
+		} else {
+			return intval($nums[0]);
+		}
 	}
 }
