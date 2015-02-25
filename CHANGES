@@ -1,6 +1,8 @@
 ==== Changes ====
 
 === version ${project.version} ===
+
+=== version 0.3 ===
   * fix a divide by zero bug
   * better error handling
 
