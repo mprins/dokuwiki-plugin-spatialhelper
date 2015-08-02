@@ -72,7 +72,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	}
 
 	/**
-	 * Create a GeoRSS Simple sitemap.
+	 * Create a GeoRSS Simple sitemap (Atom).
 	 *
 	 * @param $mediaID id
 	 *        	for the GeoRSS file
@@ -83,11 +83,12 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$idTag = 'tag:' . parse_url(DOKU_URL, PHP_URL_HOST) . ',';
 
 		$RSSstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
-		$RSSstart .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss">' . DOKU_LF;
+		$RSSstart .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss" xmlns:dc="http://purl.org/dc/elements/1.1/">' . DOKU_LF;
 		$RSSstart .= '<title>' . $conf['title'] . ' spatial feed</title>' . DOKU_LF;
 		if (! empty($conf['tagline'])) {
 			$RSSstart .= '<subtitle>' . $conf['tagline'] . '</subtitle>' . DOKU_LF;
 		}
+		$RSSstart .= '<dc:publisher>' . $conf['title'] . '</dc:publisher>' . DOKU_LF;
 		$RSSstart .= '<link href="' . DOKU_URL . '" />' . DOKU_LF;
 		$RSSstart .= '<link href="' . ml($mediaID, '', true, '&amp;', true) . '" rel="self" />' . DOKU_LF;
 		$RSSstart .= '<updated>' . date(DATE_ATOM) . '</updated>' . DOKU_LF;
