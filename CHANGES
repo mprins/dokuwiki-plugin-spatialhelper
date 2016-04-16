@@ -1,6 +1,7 @@
 ==== Changes ====
 
 === version ${project.version} ===
+  * PHP 7 compatibility fixes
 
 === version 0.3 ===
   * fix a divide by zero bug
