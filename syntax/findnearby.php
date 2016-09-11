@@ -14,10 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (! defined ( 'DOKU_INC' ))
+if (!defined('DOKU_INC'))
 	die ();
-if (! defined ( 'DOKU_PLUGIN' ))
-	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
+if (!defined('DOKU_PLUGIN'))
+	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
 require_once (DOKU_PLUGIN . 'syntax.php');
 
 /**
@@ -58,7 +58,7 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
 	 * @see Doku_Parser_Mode::connectTo()
 	 */
 	public function connectTo($mode) {
-		$this->Lexer->addSpecialPattern ( '\{\{findnearby>.*?\}\}', $mode, 'plugin_spatialhelper_findnearby' );
+		$this->Lexer->addSpecialPattern('\{\{findnearby>.*?\}\}', $mode, 'plugin_spatialhelper_findnearby');
 	}
 
 	/**
@@ -67,21 +67,21 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
 	 * @see DokuWiki_Syntax_Plugin::handle()
 	 */
 	public function handle($match, $state, $pos, Doku_Handler $handler) {
-		$data = array ();
-		$data [0] = trim ( substr ( $match, strlen ( '{{findnearby>' ), - 2 ) );
-		if (strlen ( $data [0]) < 1 ) {
-			$data [0] = $this->getLang ( 'search_findnearby' );
+		$data = array();
+		$data [0] = trim(substr($match, strlen('{{findnearby>'), - 2));
+		if (strlen($data [0]) < 1) {
+			$data [0] = $this->getLang('search_findnearby');
 		}
-		$meta = p_get_metadata ( getID (), 'geo' );
+		$meta = p_get_metadata(getID(), 'geo');
 		if ($meta) {
 			if ($meta ['lat'] && $meta ['lon']) {
-				$data [1] = array (
+				$data [1] = array(
 						'do' => 'findnearby',
 						'lat' => $meta ['lat'],
 						'lon' => $meta ['lon']
 				);
 			} elseif ($meta ['geohash']) {
-				$data [1] = array (
+				$data [1] = array(
 						'do' => 'findnearby',
 						'geohash' => $meta ['geohash']
 				);
@@ -97,11 +97,12 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
 	 * @see DokuWiki_Syntax_Plugin::render()
 	 */
 	public function render($mode, Doku_Renderer $renderer, $data) {
-		if ($data === false)
-			return false;
+		if ($data === false) {
+					return false;
+		}
 
 		if ($mode == 'xhtml') {
-			$renderer->doc .= '<a href="' . wl ( getID (), $data [1] ) . '" class="findnearby">' . hsc( $data [0] ) . '</a>';
+			$renderer->doc .= '<a href="' . wl(getID(), $data [1]) . '" class="findnearby">' . hsc($data [0]) . '</a>';
 			return true;
 		// } elseif ($mode == 'metadata') {
 		} elseif ($mode == 'odt') {

@@ -14,10 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (! defined ( 'DOKU_INC' ))
+if (!defined('DOKU_INC'))
 	die ();
-if (! defined ( 'DOKU_PLUGIN' ))
-	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
+if (!defined('DOKU_PLUGIN'))
+	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
 
 /**
  * DokuWiki Plugin spatialhelper (Search component).
@@ -31,7 +31,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *
 	 * @var array
 	 */
-	protected $spatial_idx = array ();
+	protected $spatial_idx = array();
 
 	/**
 	 * Precision, Distance of Adjacent Cell in Meters.
@@ -40,7 +40,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *
 	 * @var float
 	 */
-	private $precision = array (
+	private $precision = array(
 			5003530,
 			625441,
 			123264,
@@ -65,18 +65,18 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		// parent::__construct ();
 		global $conf;
 
-		if (! $geophp = &plugin_load ( 'helper', 'geophp' )) {
+		if (!$geophp = &plugin_load('helper', 'geophp')) {
 			$message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
-			msg ( $message, - 1 );
+			msg($message, - 1);
 			return "";
 		}
 
 		$idx_dir = $conf ['indexdir'];
-		if (! @file_exists ( $idx_dir . '/spatial.idx' )) {
-			$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+		if (!@file_exists($idx_dir . '/spatial.idx')) {
+			$indexer = plugin_load('helper', 'spatialhelper_index');
 		}
 
-		$this->spatial_idx = unserialize ( io_readFile ( $fn = $idx_dir . '/spatial.idx', false ) );
+		$this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
 	}
 
 	/**
@@ -88,8 +88,8 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *        	The x coordinate (or longitude)
 	 */
 	function findNearbyLatLon($lat, $lon) {
-		$geometry = new Point ( $lon, $lat );
-		return $this->findNearby ( $geometry->out ( 'geohash' ), $geometry );
+		$geometry = new Point($lon, $lat);
+		return $this->findNearby($geometry->out('geohash'), $geometry);
 	}
 
 	/**
@@ -102,76 +102,76 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 * @return array of ...
 	 */
 	function findNearby($geohash, Point $p = null) {
-		$_geohashClass = new Geohash ();
-		if (! $p) {
-			$decodedPoint = $_geohashClass->read ( $geohash );
+		$_geohashClass = new Geohash();
+		if (!$p) {
+			$decodedPoint = $_geohashClass->read($geohash);
 		} else {
 			$decodedPoint = $p;
 		}
 
 		// find adjacent blocks
-		$adjacent = array ();
+		$adjacent = array();
 		$adjacent ['center'] = $geohash;
-		$adjacent ['top'] = $_geohashClass->adjacent ( $adjacent ['center'], 'top' );
-		$adjacent ['bottom'] = $_geohashClass->adjacent ( $adjacent ['center'], 'bottom' );
-		$adjacent ['right'] = $_geohashClass->adjacent ( $adjacent ['center'], 'right' );
-		$adjacent ['left'] = $_geohashClass->adjacent ( $adjacent ['center'], 'left' );
-		$adjacent ['topleft'] = $_geohashClass->adjacent ( $adjacent ['left'], 'top' );
-		$adjacent ['topright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'top' );
-		$adjacent ['bottomright'] = $_geohashClass->adjacent ( $adjacent ['right'], 'bottom' );
-		$adjacent ['bottomleft'] = $_geohashClass->adjacent ( $adjacent ['left'], 'bottom' );
+		$adjacent ['top'] = $_geohashClass->adjacent($adjacent ['center'], 'top');
+		$adjacent ['bottom'] = $_geohashClass->adjacent($adjacent ['center'], 'bottom');
+		$adjacent ['right'] = $_geohashClass->adjacent($adjacent ['center'], 'right');
+		$adjacent ['left'] = $_geohashClass->adjacent($adjacent ['center'], 'left');
+		$adjacent ['topleft'] = $_geohashClass->adjacent($adjacent ['left'], 'top');
+		$adjacent ['topright'] = $_geohashClass->adjacent($adjacent ['right'], 'top');
+		$adjacent ['bottomright'] = $_geohashClass->adjacent($adjacent ['right'], 'bottom');
+		$adjacent ['bottomleft'] = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
 		// dbglog ( $adjacent, "adjacent geo hashes:" );
 
 		// find all the pages in the index that overlap with the adjacent hashes
-		$docIds = array ();
-		foreach ( $adjacent as $adjHash ) {
-			if (is_array ( $this->spatial_idx )) {
-				foreach ( $this->spatial_idx as $_geohash => $_docIds ) {
-					if (strstr ( $_geohash, $adjHash )) {
+		$docIds = array();
+		foreach ($adjacent as $adjHash) {
+			if (is_array($this->spatial_idx)) {
+				foreach ($this->spatial_idx as $_geohash => $_docIds) {
+					if (strstr($_geohash, $adjHash)) {
 						// dbglog ( "Found adjacent geo hash: $adjHash in $_geohash" );
 						// if $adjHash similar to geohash
-						$docIds = array_merge ( $docIds, $_docIds );
+						$docIds = array_merge($docIds, $_docIds);
 					}
 				}
 			}
 		}
-		$docIds = array_unique ( $docIds );
+		$docIds = array_unique($docIds);
 		// dbglog ( $docIds, "found docIDs" );
 
 		// create associative array of pages + calculate distance
-		$pages = array ();
-		$media = array ();
-		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
+		$pages = array();
+		$media = array();
+		$indexer = plugin_load('helper', 'spatialhelper_index');
 
-		foreach ( $docIds as $id ) {
-			if (strpos ( $id, 'media__', 0 ) === 0) {
-				$id = substr ( $id, strlen ( 'media__' ) );
-				if (auth_quickaclcheck ( $id ) >= /*AUTH_READ*/1) {
-					$point = $indexer->getCoordsFromExif ( $id );
-					$line = new LineString ( [
+		foreach ($docIds as $id) {
+			if (strpos($id, 'media__', 0) === 0) {
+				$id = substr($id, strlen('media__'));
+				if (auth_quickaclcheck($id) >= /*AUTH_READ*/1) {
+					$point = $indexer->getCoordsFromExif($id);
+					$line = new LineString([
 							$decodedPoint,
 							$point
-					] );
-					$media [] = array (
+					]);
+					$media [] = array(
 							'id' => $id,
-							'distance' => ( int ) ($line->greatCircleLength ()),
-							'lat' => $point->y (),
-							'lon' => $point->x ()
+							'distance' => ( int ) ($line->greatCircleLength()),
+							'lat' => $point->y(),
+							'lon' => $point->x()
 					// optionally add other meta such as tag, description...
 										);
 				}
 			} else {
-				if (auth_quickaclcheck ( $id ) >= /*AUTH_READ*/1) {
-					$geotags = p_get_metadata ( $id, 'geo' );
-					$point = new Point ( $geotags ['lon'], $geotags ['lat'] );
-					$line = new LineString ( [
+				if (auth_quickaclcheck($id) >= /*AUTH_READ*/1) {
+					$geotags = p_get_metadata($id, 'geo');
+					$point = new Point($geotags ['lon'], $geotags ['lat']);
+					$line = new LineString([
 							$decodedPoint,
 							$point
-					] );
-					$pages [] = array (
+					]);
+					$pages [] = array(
 							'id' => $id,
-							'distance' => ( int ) ($line->greatCircleLength ()),
-							'description' => p_get_metadata ( $id, 'description' )['abstract'],
+							'distance' => ( int ) ($line->greatCircleLength()),
+							'description' => p_get_metadata($id, 'description')['abstract'],
 							'lat' => $geotags ['lat'],
 							'lon' => $geotags ['lon']
 					// optionally add other meta such as tag...
@@ -181,20 +181,20 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		}
 
 		// sort all the pages/media using distance
-		usort ( $pages, function ($a, $b) {
-			return strnatcmp ( $a ['distance'], $b ['distance'] );
+		usort($pages, function($a, $b) {
+			return strnatcmp($a ['distance'], $b ['distance']);
 		} );
-		usort ( $media, function ($a, $b) {
-			return strnatcmp ( $a ['distance'], $b ['distance'] );
+		usort($media, function($a, $b) {
+			return strnatcmp($a ['distance'], $b ['distance']);
 		} );
 
-		return array (
+		return array(
 				'pages' => $pages,
 				'media' => $media,
-				'lat' => $decodedPoint->y (),
-				'lon' => $decodedPoint->x (),
+				'lat' => $decodedPoint->y(),
+				'lon' => $decodedPoint->x(),
 				'geohash' => $geohash,
-				'precision' => $this->precision [strlen ( $geohash )]
+				'precision' => $this->precision [strlen($geohash)]
 		);
 	}
 }
