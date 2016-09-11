@@ -14,10 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (! defined ( 'DOKU_INC' ))
+if (!defined('DOKU_INC'))
 	die ();
-if (! defined ( 'DOKU_PLUGIN' ))
-	define ( 'DOKU_PLUGIN', DOKU_INC . 'lib/plugins/' );
+if (!defined('DOKU_PLUGIN'))
+	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
 require_once DOKU_PLUGIN . 'admin.php';
 /**
  * DokuWiki Plugin spatialhelper (Admin Component).
@@ -52,22 +52,22 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 	 */
 	public function handle() {
 		global $conf;
-		if (isset ( $_REQUEST ['purgeindex'] )) {
+		if (isset ($_REQUEST ['purgeindex'])) {
 			global $conf;
 			$path = $conf ['indexdir'] . '/spatial.idx';
-			if (file_exists ( $path )) {
-				if (unlink ( $path )) {
-					msg ( $this->getLang ( 'admin_purged_tiles' ), 0 );
+			if (file_exists($path)) {
+				if (unlink($path)) {
+					msg($this->getLang('admin_purged_tiles'), 0);
 				}
 			}
 		}
 
-		$indexer = plugin_load ( 'helper', 'spatialhelper_index' );
-		$indexer->generateSpatialIndex ();
+		$indexer = plugin_load('helper', 'spatialhelper_index');
+		$indexer->generateSpatialIndex();
 
-		$sitemapper = plugin_load ( 'helper', 'spatialhelper_sitemap' );
-		$sitemapper->createKMLSitemap ( $this->getConf('media_kml') );
-		$sitemapper->createGeoRSSSitemap ( $this->getConf('media_georss') );
+		$sitemapper = plugin_load('helper', 'spatialhelper_sitemap');
+		$sitemapper->createKMLSitemap($this->getConf('media_kml'));
+		$sitemapper->createGeoRSSSitemap($this->getConf('media_georss'));
 	}
 
 	/**
@@ -76,17 +76,17 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 	 * @see DokuWiki_Admin_Plugin::html()
 	 */
 	public function html() {
-		echo $this->locale_xhtml ( 'admin_purge_intro' );
+		echo $this->locale_xhtml('admin_purge_intro');
 
-		$form = new Doku_Form ( array (
+		$form = new Doku_Form(array(
 				'id' => 'spatialhelper__purgeform',
 				'method' => 'post'
-		) );
-		$form->addHidden ( 'purgeindex', 'true' );
+		));
+		$form->addHidden('purgeindex', 'true');
 
-		$form->addElement ( form_makeButton ( 'submit', 'admin', $this->getLang ( 'admin_submit' ), array (
-				'title' => $this->getLang ( 'admin_submit' )
-		) ) );
-		$form->printForm ();
+		$form->addElement(form_makeButton('submit', 'admin', $this->getLang('admin_submit'), array(
+				'title' => $this->getLang('admin_submit')
+		)));
+		$form->printForm();
 	}
 }
