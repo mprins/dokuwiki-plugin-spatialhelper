@@ -1,27 +1,15 @@
-Spatial Helper plugin for DokuWiki
+# Spatial Helper plugin for DokuWiki
 
 Provides spatial indexing and spatial search facilities.
 
 All documentation for this plugin can be found at http://www.dokuwiki.org/plugin:spatialhelper
 
-If you install this plugin manually, make sure it is installed in
-lib/plugins/spatialhelper/ - if the folder is called different it
-will not work!
+If you install this plugin manually, make sure it is installed in lib/plugins/spatialhelper/ - if the folder is called different it will not work!
 
-Please refer to http://www.dokuwiki.org/plugins for additional info
-on how to install plugins in DokuWiki.
+Please refer to http://www.dokuwiki.org/plugins for additional info on how to install plugins in DokuWiki.
 
-----
-  Copyright (c) 2011-2016 Mark C. Prins <mprins@users.sf.net>
-
-  Permission to use, copy, modify, and distribute this software for any
-  purpose with or without fee is hereby granted, provided that the above
-  copyright notice and this permission notice appear in all copies.
-
-  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+[![Build Status](https://travis-ci.org/mprins/dokuwiki-plugin-spatialhelper.svg?branch=master)](https://travis-ci.org/mprins/dokuwiki-plugin-spatialhelper)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mprins/dokuwiki-plugin-spatialhelper/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mprins/dokuwiki-plugin-spatialhelper/?branch=master)
+[![GitHub issues](https://img.shields.io/github/issues/mprins/dokuwiki-plugin-spatialhelper.svg)](https://github.com/mprins/dokuwiki-plugin-spatialhelper/issues)
+[![GitHub forks](https://img.shields.io/github/forks/mprins/dokuwiki-plugin-spatialhelper.svg)](https://github.com/mprins/dokuwiki-plugin-spatialhelper/network)
+[![GitHub stars](https://img.shields.io/github/stars/mprins/dokuwiki-plugin-spatialhelper.svg)](https://github.com/mprins/dokuwiki-plugin-spatialhelper/stargazers)
