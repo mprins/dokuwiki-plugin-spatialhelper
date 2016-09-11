@@ -1,7 +1,7 @@
-base   ${project.artifactId}
+base   spatialhelper
 author Mark C. Prins
 email  mprins@users.sf.net
-date   ${buildNumber} (${project.version})
-name   ${project.name}
-desc   ${project.description}
-url    ${project.url}
+date   2016-09-11
+name   Spatial Helper plugin for DokuWiki
+desc   Provides spatial indexing and spatial search facilities.
+url    http://www.dokuwiki.org/plugin:spatialhelper
