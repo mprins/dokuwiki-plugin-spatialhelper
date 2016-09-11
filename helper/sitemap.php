@@ -14,11 +14,11 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (! defined('DOKU_INC'))
+if (!defined('DOKU_INC'))
 	die ();
-if (! defined('DOKU_PLUGIN'))
+if (!defined('DOKU_PLUGIN'))
 	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
-if (! defined('DOKU_LF'))
+if (!defined('DOKU_LF'))
 	define('DOKU_LF', "\n");
 
 /**
@@ -31,7 +31,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	/**
 	 * spatial index.
 	 */
-	var $spatial_idx = array ();
+	var $spatial_idx = array();
 
 	/**
 	 * constructor, load spatial index.
@@ -42,29 +42,29 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$idx_dir = $conf['indexdir'];
 		if (!@file_exists($idx_dir . '/spatial.idx')) {
 			$indexer = plugin_load('helper', 'spatialhelper_index');
-			$indexer->generateSpatialIndex ();
+			$indexer->generateSpatialIndex();
 		}
 		$this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
 	}
 
 	function getMethods() {
-		$result[] = array (
+		$result[] = array(
 				'name' => 'createGeoRSSSitemap',
 				'desc' => 'create a spatial sitemap in GeoRSS format.',
-				'params' => array (
+				'params' => array(
 						'path' => 'string'
 				),
-				'return' => array (
+				'return' => array(
 						'success' => 'boolean'
 				)
 		);
-		$result[] = array (
+		$result[] = array(
 				'name' => 'createKMLSitemap',
 				'desc' => 'create a spatial sitemap in KML format.',
-				'params' => array (
+				'params' => array(
 						'path' => 'string'
 				),
-				'return' => array (
+				'return' => array(
 						'success' => 'boolean'
 				)
 		);
@@ -85,7 +85,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$RSSstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
 		$RSSstart .= '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss" xmlns:dc="http://purl.org/dc/elements/1.1/">' . DOKU_LF;
 		$RSSstart .= '<title>' . $conf['title'] . ' spatial feed</title>' . DOKU_LF;
-		if (! empty($conf['tagline'])) {
+		if (!empty($conf['tagline'])) {
 			$RSSstart .= '<subtitle>' . $conf['tagline'] . '</subtitle>' . DOKU_LF;
 		}
 		$RSSstart .= '<dc:publisher>' . $conf['title'] . '</dc:publisher>' . DOKU_LF;
@@ -103,16 +103,18 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$fh = fopen(mediaFN($mediaID), 'w');
 		fwrite($fh, $RSSstart);
 
-		foreach($this->spatial_idx as $idxEntry) {
+		foreach ($this->spatial_idx as $idxEntry) {
 			// get list of id's
-			foreach($idxEntry as $id) {
+			foreach ($idxEntry as $id) {
 				// for document item in the index
 				if (strpos($id, 'media__', 0) !== 0) {
 					// public and non-hidden pages only
-					if (isHiddenPage($id))
-						continue;
-					if (auth_aclcheck($id, '', '') < AUTH_READ)
-						continue;
+					if (isHiddenPage($id)) {
+											continue;
+					}
+					if (auth_aclcheck($id, '', '') < AUTH_READ) {
+											continue;
+					}
 
 					$meta = p_get_metadata($id);
 
@@ -172,16 +174,18 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$fh = fopen(mediaFN($mediaID), 'w');
 		fwrite($fh, $KMLstart);
 
-		foreach($this->spatial_idx as $idxEntry) {
+		foreach ($this->spatial_idx as $idxEntry) {
 			// get list of id's
-			foreach($idxEntry as $id) {
+			foreach ($idxEntry as $id) {
 				// for document item in the index
 				if (strpos($id, 'media__', 0) !== 0) {
 					// public and non-hidden pages only
-					if (isHiddenPage($id))
-						continue;
-					if (auth_aclcheck($id, '', '') < AUTH_READ)
-						continue;
+					if (isHiddenPage($id)) {
+											continue;
+					}
+					if (auth_aclcheck($id, '', '') < AUTH_READ) {
+											continue;
+					}
 
 					$meta = p_get_metadata($id);
 
@@ -194,7 +198,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 					$plcm .= '  <name>' . $meta['title'] . '</name>' . DOKU_LF;
 					// TODO escape quotes in: title="' . $meta['title'] . '"
 					$plcm .= '  <atom:link href="' . wl($id, '' . true) . '" rel="alternate" type="text/html" />' . DOKU_LF;
-					if (! empty($meta['creator'])) {
+					if (!empty($meta['creator'])) {
 						$entry .= '  <atom:author><atom:name>' . $meta['creator'] . '</atom:name></atom:author>' . DOKU_LF;
 					}
 
