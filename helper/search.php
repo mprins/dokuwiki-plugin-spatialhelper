@@ -14,10 +14,12 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (!defined('DOKU_INC'))
+if (!defined('DOKU_INC')) {
 	die ();
-if (!defined('DOKU_PLUGIN'))
+}
+if (!defined('DOKU_PLUGIN')) {
 	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
+}
 
 /**
  * DokuWiki Plugin spatialhelper (Search component).

@@ -14,12 +14,15 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (!defined('DOKU_INC'))
+if (!defined('DOKU_INC')) {
 	die ();
-if (!defined('DOKU_PLUGIN'))
+}
+if (!defined('DOKU_PLUGIN')) {
 	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
-if (!defined('DOKU_LF'))
+}
+if (!defined('DOKU_LF')) {
 	define('DOKU_LF', "\n");
+}
 require_once (DOKU_PLUGIN . 'action.php');
 
 /**
@@ -166,8 +169,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	not used
 	 */
 	function handle_action_act_preprocess(Doku_Event $event, $param) {
-		if ($event->data != 'findnearby')
-			return;
+		if ($event->data != 'findnearby') {
+					return;
+		}
 		$event->preventDefault();
 	}
 
@@ -181,8 +185,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	'format'=> HTML | JSON
 	 */
 	function _findnearby(Doku_Event & $event, $param) {
-		if ($event->data != 'findnearby')
-			return;
+		if ($event->data != 'findnearby') {
+					return;
+		}
 		$event->preventDefault();
 
 		global $INPUT;

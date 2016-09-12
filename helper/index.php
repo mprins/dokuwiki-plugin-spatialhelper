@@ -14,8 +14,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (!defined('DOKU_INC'))
+if (!defined('DOKU_INC')) {
 	die ();
+}
 
 /**
  * DokuWiki Plugin spatialhelper (index component).
@@ -75,8 +76,12 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 */
 	function updateSpatialIndex($id) {
 		$geotags = p_get_metadata($id, 'geo');
-		if (empty ($geotags)) return false;
-		if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) return false;
+		if (empty ($geotags)) {
+			return false;
+		}
+		if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) {
+			return false;
+		}
 		// dbglog ( $geotags, "Geo metadata found for page $id" );
 		$geometry = new Point($geotags ['lon'], $geotags ['lat']);
 		$geohash = $geometry->out('geohash');
@@ -112,8 +117,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	function deleteFromIndex($id) {
 		// check the index for document
 		$knownHashes = $this->findHashesForId($id, $this->spatial_idx);
-		if (empty ($knownHashes))
-			return;
+		if (empty ($knownHashes)) {
+					return;
+		}
 
 			// TODO shortcut, need to make sure there is only one element, if not the index is corrupt
 		$knownHash = $knownHashes [0];
@@ -153,8 +159,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$media = array();
 		search($media, $conf ['mediadir'], 'search_media', array());
 		foreach ($media as $medium) {
-			if ($medium ['isimg'])
-				$this->indexImage($medium);
+			if ($medium ['isimg']) {
+							$this->indexImage($medium);
+			}
 		}
 		return true;
 	}
