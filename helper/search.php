@@ -63,7 +63,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	/**
 	 * constructor; initialize/load spatial index.
 	 */
-	function __construct() {
+	public function __construct() {
 		// parent::__construct ();
 		global $conf;
 
@@ -89,7 +89,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 * @param numeric $lon
 	 *        	The x coordinate (or longitude)
 	 */
-	function findNearbyLatLon($lat, $lon) {
+	public function findNearbyLatLon($lat, $lon) {
 		$geometry = new Point($lon, $lat);
 		return $this->findNearby($geometry->out('geohash'), $geometry);
 	}
@@ -103,7 +103,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 	 *        	optional point
 	 * @return array of ...
 	 */
-	function findNearby($geohash, Point $p = null) {
+	public function findNearby($geohash, Point $p = null) {
 		$_geohashClass = new Geohash();
 		if (!$p) {
 			$decodedPoint = $_geohashClass->read($geohash);
@@ -122,7 +122,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		$adjacent ['topright'] = $_geohashClass->adjacent($adjacent ['right'], 'top');
 		$adjacent ['bottomright'] = $_geohashClass->adjacent($adjacent ['right'], 'bottom');
 		$adjacent ['bottomleft'] = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
-		// dbglog ( $adjacent, "adjacent geo hashes:" );
+		dbglog ( $adjacent, "adjacent geo hashes:" );
 
 		// find all the pages in the index that overlap with the adjacent hashes
 		$docIds = array();
@@ -138,7 +138,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 			}
 		}
 		$docIds = array_unique($docIds);
-		// dbglog ( $docIds, "found docIDs" );
+		dbglog ( $docIds, "found docIDs" );
 
 		// create associative array of pages + calculate distance
 		$pages = array();
