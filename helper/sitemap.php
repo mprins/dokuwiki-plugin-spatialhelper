@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2014-2015 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2016 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -39,7 +39,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	/**
 	 * constructor, load spatial index.
 	 */
-	function __construct() {
+	public function __construct() {
 		// parent::__construct();
 		global $conf;
 		$idx_dir = $conf['indexdir'];
@@ -50,7 +50,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		$this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
 	}
 
-	function getMethods() {
+	public function getMethods() {
 		$result[] = array(
 				'name' => 'createGeoRSSSitemap',
 				'desc' => 'create a spatial sitemap in GeoRSS format.',
@@ -80,7 +80,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 * @param $mediaID id
 	 *        	for the GeoRSS file
 	 */
-	function createGeoRSSSitemap($mediaID) {
+	public function createGeoRSSSitemap($mediaID) {
 		global $conf;
 
 		$idTag = 'tag:' . parse_url(DOKU_URL, PHP_URL_HOST) . ',';
@@ -155,7 +155,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 * @param $mediaID id
 	 *        	for the KML file
 	 */
-	function createKMLSitemap($mediaID) {
+	public function createKMLSitemap($mediaID) {
 		global $conf;
 
 		$KMLstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;

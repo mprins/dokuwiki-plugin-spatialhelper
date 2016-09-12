@@ -106,10 +106,11 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
 		if ($mode == 'xhtml') {
 			$renderer->doc .= '<a href="' . wl(getID(), $data [1]) . '" class="findnearby">' . hsc($data [0]) . '</a>';
 			return true;
-		// } elseif ($mode == 'metadata') {
+		} elseif ($mode == 'metadata') {
+			return false;
 		} elseif ($mode == 'odt') {
 			// don't render anything in ODT
-			return true;
+			return false;
 		}
 		return false;
 	}

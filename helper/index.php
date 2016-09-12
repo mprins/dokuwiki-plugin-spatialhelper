@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2015 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2016 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -48,7 +48,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	/**
 	 * Constructor, initialises the spatial index.
 	 */
-	function __construct() {
+	public function __construct() {
 		// parent::__construct ();
 		if (!$geophp = &plugin_load('helper', 'geophp')) {
 			$message = 'helper_plugin_spatialhelper_index::spatialhelper_index: geophp plugin is not available.';
@@ -64,7 +64,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			$this->generateSpatialIndex();
 		} else {
 			$this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false));
-			// dbglog ( $this->spatial_idx, 'done loading spatial index' );
+			dbglog($this->spatial_idx, 'done loading spatial index');
 		}
 	}
 
@@ -74,7 +74,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @param string $id
 	 *        	the document ID
 	 */
-	function updateSpatialIndex($id) {
+	public function updateSpatialIndex($id) {
 		$geotags = p_get_metadata($id, 'geo');
 		if (empty ($geotags)) {
 			return false;
@@ -82,10 +82,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) {
 			return false;
 		}
-		// dbglog ( $geotags, "Geo metadata found for page $id" );
+		dbglog($geotags, "Geo metadata found for page $id");
 		$geometry = new Point($geotags ['lon'], $geotags ['lat']);
 		$geohash = $geometry->out('geohash');
-		// dbglog ( 'Update index for geohash: ' . $geohash );
+		dbglog('Update index for geohash: ' . $geohash);
 		$succes = $this->_addToIndex($geohash, $id);
 	}
 
@@ -97,14 +97,14 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @param array $index
 	 *        	spatial index
 	 */
-	function findHashesForId($id, $index) {
+	public function findHashesForId($id, $index) {
 		$hashes = array();
 		foreach ($index as $hash => $docIds) {
 			if (in_array($id, $docIds, false)) {
 				$hashes [] = $hash;
 			}
 		}
-		// dbglog ( $hashes, "Found the following hashes for $id (should only be 1)" );
+		dbglog($hashes, "Found the following hashes for $id (should only be 1)");
 		return $hashes;
 	}
 
@@ -114,18 +114,18 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * @param String $id
 	 *        	document ID
 	 */
-	function deleteFromIndex($id) {
+	public function deleteFromIndex($id) {
 		// check the index for document
 		$knownHashes = $this->findHashesForId($id, $this->spatial_idx);
 		if (empty ($knownHashes)) {
-					return;
+			return;
 		}
 
-			// TODO shortcut, need to make sure there is only one element, if not the index is corrupt
+		// TODO shortcut, need to make sure there is only one element, if not the index is corrupt
 		$knownHash = $knownHashes [0];
 		$knownIds = $this->spatial_idx [$knownHash];
 		$i = array_search($id, $knownIds);
-		// dbglog ( "removing: $knownIds[$i] from the index." );
+		dbglog("removing: $knownIds[$i] from the index.");
 		unset ($knownIds [$i]);
 		$this->spatial_idx [$knownHash] = $knownIds;
 		if (empty ($this->spatial_idx [$knownHash])) {
@@ -147,7 +147,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 *
 	 * @todo add an option to erase the old index
 	 */
-	function generateSpatialIndex() {
+	public function generateSpatialIndex() {
 		global $conf;
 		require_once (DOKU_INC . 'inc/search.php');
 		$pages = array();
@@ -160,7 +160,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		search($media, $conf ['mediadir'], 'search_media', array());
 		foreach ($media as $medium) {
 			if ($medium ['isimg']) {
-							$this->indexImage($medium);
+				$this->indexImage($medium);
 			}
 		}
 		return true;
@@ -169,13 +169,13 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	/**
 	 * Add an index entry for this file having EXIF / IPTC data.
 	 *
-	 * @param unknown_type $param
+	 * @param unknown_type $img Dokuwiki image
 	 * @see http://www.php.net/manual/en/function.iptcparse.php
 	 * @see http://php.net/manual/en/function.exif-read-data.php
 	 *
-	 * @return true when image was succesfully added to the index.
+	 * @return boolean true when image was succesfully added to the index.
 	 */
-	function indexImage($img) {
+	public function indexImage($img) {
 		// test for supported files (jpeg only)
 		if ((substr($img ['file'], - strlen('.jpg')) !== '.jpg') and (substr($img ['file'], - strlen('.jpeg')) !== '.jpeg')) {
 			return false;
@@ -234,10 +234,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$pageIds = array();
 		// check index for key/geohash
 		if (!array_key_exists($geohash, $this->spatial_idx)) {
-			// dbglog ( "Geohash $geohash not in index, just add $id." );
+			dbglog("Geohash $geohash not in index, just add $id.");
 			$pageIds [] = $id;
 		} else {
-			// dbglog ( 'Geohash for document is in index, find it.' );
+			dbglog('Geohash for document is in index, find it.');
 			// check the index for document
 			$knownHashes = $this->findHashesForId($id, $this->spatial_idx);
 			if (empty ($knownHashes)) {
@@ -249,17 +249,17 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			$knownHash = $knownHashes [0];
 
 			if ($knownHash == $geohash) {
-				// dbglog ( "Document $id was found in index and has the same geohash, nothing to do." );
+				dbglog("Document $id was found in index and has the same geohash, nothing to do.");
 				return true;
 			}
 
 			if (!empty ($knownHash)) {
-				// dbglog ( "Document/media $id was found in index but has different geohash (it moved)." );
+				dbglog("Document/media $id was found in index but has different geohash (it moved).");
 				$knownIds = $this->spatial_idx [$knownHash];
-				// dbglog ( $knownIds, "Known id's for this hash:" );
+				dbglog($knownIds, "Known id's for this hash:");
 				// remove it from the old geohash element
 				$i = array_search($id, $knownIds);
-				// dbglog ( 'Unsetting:' . $knownIds [$i] );
+				dbglog('Unsetting:' . $knownIds [$i]);
 				unset ($knownIds [$i]);
 				$this->spatial_idx [$knownHash] = $knownIds;
 				// set on new geohash element

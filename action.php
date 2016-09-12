@@ -76,7 +76,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param object $param
 	 *        	the parameters passed to register_hook when this handler was registered
 	 */
-	function handle_indexer_page_add(Doku_Event $event, $param) {
+	public function handle_indexer_page_add(Doku_Event $event, $param) {
 		// $event→data['page'] – the page id
 		// $event→data['body'] – empty, can be filled by additional content to index by your plugin
 		// $event→data['metadata'] – the metadata that shall be indexed. This is an array where the keys are the metadata indexes and the value a string or an array of strings with the values. title and relation_references will already be set.
@@ -93,7 +93,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param object $param
 	 *        	the parameters passed to register_hook when this handler was registered
 	 */
-	function _removeFromIndex(Doku_Event & $event, $param) {
+	public function _removeFromIndex(Doku_Event & $event, $param) {
 		// event data:
 		// $data[0] – The raw arguments for io_saveFile as an array. Do not change file path.
 		// $data[0][0] – the file path.
@@ -102,7 +102,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $data[2] – page_name: The wiki page name.
 		// $data[3] – rev: The page revision, false for current wiki pages.
 
-		// dbglog ( $event->data, "Event data in _removeFromIndex." );
+		dbglog($event->data, "Event data in _removeFromIndex.");
 		if (@file_exists($event->data [0] [0])) {
 			// file not new
 			if (!$event->data [0] [1]) {
@@ -127,11 +127,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param Doku_Event $event
 	 * @param unknown $param
 	 */
-	function handle_sitemap_generate_before(Doku_Event $event, $param) {
+	public function handle_sitemap_generate_before(Doku_Event $event, $param) {
 		$path = mediaFN($this->getConf('media_kml'));
 		$lastmod = @filemtime($path);
 		$event->data ['items'] [] = new SitemapItem(ml($this->getConf('media_kml'), '', true, '&amp;', true), $lastmod);
-		// dbglog ( $event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages." );
+		dbglog($event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages.");
 	}
 
 	/**
@@ -142,20 +142,20 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param mixed $param
 	 *        	parameter array, not used
 	 */
-	function handle_sitemap_generate_after(Doku_Event $event, $param) {
+	public function handle_sitemap_generate_after(Doku_Event $event, $param) {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
 
-		// dbglog ($event->data['items'], "createSpatialSitemap loading helper" );
+		dbglog($event->data['items'], "createSpatialSitemap loading helper");
 		if ($helper = & plugin_load('helper', 'spatialhelper_sitemap')) {
-			// dbglog ( $helper, "createSpatialSitemap loaded helper." );
+			dbglog($helper, "createSpatialSitemap loaded helper.");
 
 			$kml = $helper->createKMLSitemap($this->getConf('media_kml'));
 			$rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
 
 			return $kml && $rss;
 		} else {
-			// dbglog ( $helper, "createSpatialSitemap NOT loaded helper." );
+			dbglog($helper, "createSpatialSitemap NOT loaded helper.");
 		}
 	}
 
@@ -168,7 +168,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 * @param mixed $param
 	 *        	not used
 	 */
-	function handle_action_act_preprocess(Doku_Event $event, $param) {
+	public function handle_action_act_preprocess(Doku_Event $event, $param) {
 		if ($event->data != 'findnearby') {
 					return;
 		}
@@ -184,7 +184,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	associative array with keys
 	 *        	'format'=> HTML | JSON
 	 */
-	function _findnearby(Doku_Event & $event, $param) {
+	public function _findnearby(Doku_Event & $event, $param) {
 		if ($event->data != 'findnearby') {
 					return;
 		}
@@ -299,7 +299,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	 *        	event object by reference
 	 * @param unknown $param
 	 */
-	function _handle_media_uploaded(Doku_Event & $event, $param) {
+	public function _handle_media_uploaded(Doku_Event & $event, $param) {
 		// data[0] temporary file name (read from $_FILES)
 		// data[1] file name of the file being uploaded
 		// data[2] future directory id of the file being uploaded
@@ -307,7 +307,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// data[4] true if the uploaded file exists already
 		// data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
 
-		// dbglog ( $event->data, "_handle_media_uploaded::event data" );
+		dbglog($event->data, "_handle_media_uploaded::event data");
 
 		// check the list of mimetypes
 		// if it's a supported type call appropriate index function
@@ -324,13 +324,13 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	/**
 	 * removes the media from the index.
 	 */
-	function _handle_media_deleted(Doku_Event & $event, $param) {
+	public function _handle_media_deleted(Doku_Event & $event, $param) {
 		// data['id'] ID data['unl'] unlink return code
 		// data['del'] Namespace directory unlink return code
 		// data['name'] file name data['path'] full path to the file
 		// data['size'] file size
 
-		// dbglog ( $event->data, "_handle_media_deleted::event data" );
+		dbglog($event->data, "_handle_media_deleted::event data");
 
 		// remove the media id from the index
 		$indexer = & plugin_load('helper', 'spatialhelper_index');
