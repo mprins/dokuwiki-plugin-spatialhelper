@@ -102,7 +102,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $data[2] – page_name: The wiki page name.
 		// $data[3] – rev: The page revision, false for current wiki pages.
 
-		dbglog ( $event->data, "Event data in _removeFromIndex." );
+		dbglog($event->data, "Event data in _removeFromIndex.");
 		if (@file_exists($event->data [0] [0])) {
 			// file not new
 			if (!$event->data [0] [1]) {
@@ -131,7 +131,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		$path = mediaFN($this->getConf('media_kml'));
 		$lastmod = @filemtime($path);
 		$event->data ['items'] [] = new SitemapItem(ml($this->getConf('media_kml'), '', true, '&amp;', true), $lastmod);
-		dbglog ( $event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages." );
+		dbglog($event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages.");
 	}
 
 	/**
@@ -146,16 +146,16 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
 
-		dbglog ($event->data['items'], "createSpatialSitemap loading helper" );
+		dbglog($event->data['items'], "createSpatialSitemap loading helper");
 		if ($helper = & plugin_load('helper', 'spatialhelper_sitemap')) {
-			dbglog ( $helper, "createSpatialSitemap loaded helper." );
+			dbglog($helper, "createSpatialSitemap loaded helper.");
 
 			$kml = $helper->createKMLSitemap($this->getConf('media_kml'));
 			$rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
 
 			return $kml && $rss;
 		} else {
-			dbglog ( $helper, "createSpatialSitemap NOT loaded helper." );
+			dbglog($helper, "createSpatialSitemap NOT loaded helper.");
 		}
 	}
 
@@ -307,7 +307,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// data[4] true if the uploaded file exists already
 		// data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
 
-		dbglog ( $event->data, "_handle_media_uploaded::event data" );
+		dbglog($event->data, "_handle_media_uploaded::event data");
 
 		// check the list of mimetypes
 		// if it's a supported type call appropriate index function
@@ -330,7 +330,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// data['name'] file name data['path'] full path to the file
 		// data['size'] file size
 
-		dbglog ( $event->data, "_handle_media_deleted::event data" );
+		dbglog($event->data, "_handle_media_deleted::event data");
 
 		// remove the media id from the index
 		$indexer = & plugin_load('helper', 'spatialhelper_index');

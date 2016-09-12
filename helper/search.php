@@ -122,7 +122,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 		$adjacent ['topright'] = $_geohashClass->adjacent($adjacent ['right'], 'top');
 		$adjacent ['bottomright'] = $_geohashClass->adjacent($adjacent ['right'], 'bottom');
 		$adjacent ['bottomleft'] = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
-		dbglog ( $adjacent, "adjacent geo hashes:" );
+		dbglog($adjacent, "adjacent geo hashes:");
 
 		// find all the pages in the index that overlap with the adjacent hashes
 		$docIds = array();
@@ -138,7 +138,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 			}
 		}
 		$docIds = array_unique($docIds);
-		dbglog ( $docIds, "found docIDs" );
+		dbglog($docIds, "found docIDs");
 
 		// create associative array of pages + calculate distance
 		$pages = array();
