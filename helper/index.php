@@ -169,11 +169,11 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	/**
 	 * Add an index entry for this file having EXIF / IPTC data.
 	 *
-	 * @param unknown_type $param
+	 * @param unknown_type $img Dokuwiki image
 	 * @see http://www.php.net/manual/en/function.iptcparse.php
 	 * @see http://php.net/manual/en/function.exif-read-data.php
 	 *
-	 * @return true when image was succesfully added to the index.
+	 * @return boolean true when image was succesfully added to the index.
 	 */
 	public function indexImage($img) {
 		// test for supported files (jpeg only)
