@@ -64,7 +64,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			$this->generateSpatialIndex();
 		} else {
 			$this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false));
-			dbglog ( $this->spatial_idx, 'done loading spatial index' );
+			dbglog($this->spatial_idx, 'done loading spatial index');
 		}
 	}
 
@@ -82,10 +82,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) {
 			return false;
 		}
-		dbglog ( $geotags, "Geo metadata found for page $id" );
+		dbglog($geotags, "Geo metadata found for page $id");
 		$geometry = new Point($geotags ['lon'], $geotags ['lat']);
 		$geohash = $geometry->out('geohash');
-		dbglog ( 'Update index for geohash: ' . $geohash );
+		dbglog('Update index for geohash: ' . $geohash);
 		$succes = $this->_addToIndex($geohash, $id);
 	}
 
@@ -104,7 +104,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 				$hashes [] = $hash;
 			}
 		}
-		dbglog ( $hashes, "Found the following hashes for $id (should only be 1)" );
+		dbglog($hashes, "Found the following hashes for $id (should only be 1)");
 		return $hashes;
 	}
 
@@ -125,7 +125,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$knownHash = $knownHashes [0];
 		$knownIds = $this->spatial_idx [$knownHash];
 		$i = array_search($id, $knownIds);
-		dbglog ( "removing: $knownIds[$i] from the index." );
+		dbglog("removing: $knownIds[$i] from the index.");
 		unset ($knownIds [$i]);
 		$this->spatial_idx [$knownHash] = $knownIds;
 		if (empty ($this->spatial_idx [$knownHash])) {
@@ -234,10 +234,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$pageIds = array();
 		// check index for key/geohash
 		if (!array_key_exists($geohash, $this->spatial_idx)) {
-			dbglog ( "Geohash $geohash not in index, just add $id." );
+			dbglog("Geohash $geohash not in index, just add $id.");
 			$pageIds [] = $id;
 		} else {
-			dbglog ( 'Geohash for document is in index, find it.' );
+			dbglog('Geohash for document is in index, find it.');
 			// check the index for document
 			$knownHashes = $this->findHashesForId($id, $this->spatial_idx);
 			if (empty ($knownHashes)) {
@@ -249,17 +249,17 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			$knownHash = $knownHashes [0];
 
 			if ($knownHash == $geohash) {
-				dbglog ( "Document $id was found in index and has the same geohash, nothing to do." );
+				dbglog("Document $id was found in index and has the same geohash, nothing to do.");
 				return true;
 			}
 
 			if (!empty ($knownHash)) {
-				dbglog ( "Document/media $id was found in index but has different geohash (it moved)." );
+				dbglog("Document/media $id was found in index but has different geohash (it moved).");
 				$knownIds = $this->spatial_idx [$knownHash];
-				dbglog ( $knownIds, "Known id's for this hash:" );
+				dbglog($knownIds, "Known id's for this hash:");
 				// remove it from the old geohash element
 				$i = array_search($id, $knownIds);
-				dbglog ( 'Unsetting:' . $knownIds [$i] );
+				dbglog('Unsetting:' . $knownIds [$i]);
 				unset ($knownIds [$i]);
 				$this->spatial_idx [$knownHash] = $knownIds;
 				// set on new geohash element
