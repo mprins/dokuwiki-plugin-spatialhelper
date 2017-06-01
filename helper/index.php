@@ -286,8 +286,8 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		$min = $this->convertRationaltoFloat($param [1]) / 60;
 		$sec = $this->convertRationaltoFloat($param [2]) / 60 / 60;
 		// Hemisphere (N, S, W or E)
-        $hem = ($param [3] === 'N' || $param [3] === 'E') ? 1 : -1;
-        return $hem * ($deg + $min + $sec);
+		$hem = ($param [3] === 'N' || $param [3] === 'E') ? 1 : -1;
+		return $hem * ($deg + $min + $sec);
 	}
 
 	public function convertRationaltoFloat($param) {

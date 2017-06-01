@@ -20,22 +20,22 @@ class index_test extends \DokuWikiTest {
     public static function convertDMStoD_testdata() {
         return array(
             array(
-                array ( 0 => '52/1', 1 => '31/1', 2 => '2/1', 3 => 'N', ),
+                array(0 => '52/1', 1 => '31/1', 2 => '2/1', 3 => 'N',),
                 52.5172,
                 'Latitude in Europe'
             ),
             array(
-                array ( 0 => '13/1', 1 => '30/1', 2 => '38/1', 3 => 'E', ),
+                array(0 => '13/1', 1 => '30/1', 2 => '38/1', 3 => 'E',),
                 13.5105,
                 'Longitude in Europe'
             ),
             array(
-                array ( 0 => '50/1', 1 => '34251480/1000000', 2 => '0/1', 3 => 'N', ),
+                array(0 => '50/1', 1 => '34251480/1000000', 2 => '0/1', 3 => 'N',),
                 50.5708,
                 'Latitude in North America'
             ),
             array(
-                array ( 0 => '109/1', 1 => '28041300/1000000', 2 => '0/1', 3 => 'W', ),
+                array(0 => '109/1', 1 => '28041300/1000000', 2 => '0/1', 3 => 'W',),
                 -109.4673,
                 'Longitude in North America'
             ),
