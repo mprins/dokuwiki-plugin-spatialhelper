@@ -51,7 +51,7 @@ class index_test extends \DokuWikiTest {
         /** @var \helper_plugin_spatialhelper_index $index */
         $index = plugin_load('helper', 'spatialhelper_index');
 
-        $actual_output = $index->_convertDMStoD($input);
+        $actual_output = $index->convertDMStoD($input);
 
         $this->assertEquals($expected_output, $actual_output, $msg, 0.0001);
     }

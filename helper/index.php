@@ -205,14 +205,14 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 			return false;
 		}
 
-		$lat = $this->_convertDMStoD(array(
+		$lat = $this->convertDMStoD(array(
 				$exif ['GPS'] ['GPSLatitude'] [0],
 				$exif ['GPS'] ['GPSLatitude'] [1],
 				$exif ['GPS'] ['GPSLatitude'] [2],
 				$exif ['GPS'] ['GPSLatitudeRef']
 		));
 
-		$lon = $this->_convertDMStoD(array(
+		$lon = $this->convertDMStoD(array(
 				$exif ['GPS'] ['GPSLongitude'] [0],
 				$exif ['GPS'] ['GPSLongitude'] [1],
 				$exif ['GPS'] ['GPSLongitude'] [2],
@@ -275,11 +275,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	/**
 	 * convert DegreesMinutesSeconds to Decimal degrees.
 	 *
-	 * @param unknown $param
-	 *        	array of rational DMS
+	 * @param array $param array of rational DMS
 	 * @return number
 	 */
-	private function _convertDMStoD($param) {
+	public function convertDMStoD($param) {
 		if (!is_array($param)) {
 			$param = array($param);
 		}
