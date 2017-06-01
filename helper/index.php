@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2016 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2017 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -282,15 +282,15 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 		if (!is_array($param)) {
 			$param = array($param);
 		}
-		$deg = $this->_convertRationaltoFloat($param [0]);
-		$min = $this->_convertRationaltoFloat($param [1]) / 60;
-		$sec = $this->_convertRationaltoFloat($param [2]) / 60 / 60;
+		$deg = $this->convertRationaltoFloat($param [0]);
+		$min = $this->convertRationaltoFloat($param [1]) / 60;
+		$sec = $this->convertRationaltoFloat($param [2]) / 60 / 60;
 		// Hemisphere (N, S, W or E)
         $hem = ($param [3] === 'N' || $param [3] === 'E') ? 1 : -1;
         return $hem * ($deg + $min + $sec);
 	}
 
-	private function _convertRationaltoFloat($param) {
+	public function convertRationaltoFloat($param) {
 		// rational64u
 		$nums = explode('/', $param);
 		if (intval($nums[1]) > 0) {
