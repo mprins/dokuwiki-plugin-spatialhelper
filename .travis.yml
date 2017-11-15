@@ -13,6 +13,8 @@ matrix:
     - php: "hhvm"
     - php: "nightly"
       env: DOKUWIKI=stable
+    - php: "7.0"
+      env: DOKUWIKI=stable
     - php: "7.1"
       env: DOKUWIKI=stable
 
