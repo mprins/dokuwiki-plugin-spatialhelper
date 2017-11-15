@@ -230,7 +230,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		if (!empty($namespace)) {
 			// only if id is in or below namespace
 			if (0 !== strpos(getNS($id), $namespace)) {
-				dbglog("helper_plugin_spatialhelper_sitemap::_skipPage, skipping $id, not in $namespace");
+				// dbglog("helper_plugin_spatialhelper_sitemap::_skipPage, skipping $id, not in $namespace");
 				return true;
 			}
 		}

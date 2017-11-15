@@ -146,7 +146,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
 		if ($helper = & plugin_load('helper', 'spatialhelper_sitemap')) {
-			dbglog($helper, "createSpatialSitemap loaded helper.");
+			// dbglog($helper, "createSpatialSitemap loaded helper.");
 
 			$kml = $helper->createKMLSitemap($this->getConf('media_kml'));
 			$rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
@@ -154,9 +154,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			if (!empty ($this->getConf('sitemap_namespaces'))) {
 				$namespaces = array_map('trim',explode("\n",$this->getConf('sitemap_namespaces')));
 				foreach ($namespaces as $namespace) {
-					dbglog($namespace, "handle_sitemap_generate_after, create sitemap for: ");
 					$kmlN = $helper->createKMLSitemap($namespace . $this->getConf('media_kml'));
 					$rssN = $helper->createGeoRSSSitemap($namespace . $this->getConf('media_georss'));
+					dbglog( $kmlN && $rssN, "handle_sitemap_generate_after, created KML / GeoRSS sitemap in $namespace, succes: ");
 				}  
 			}
 			return $kml && $rss;
