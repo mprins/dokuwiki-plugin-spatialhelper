@@ -131,7 +131,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 		$path = mediaFN($this->getConf('media_kml'));
 		$lastmod = @filemtime($path);
 		$event->data ['items'] [] = new SitemapItem(ml($this->getConf('media_kml'), '', true, '&amp;', true), $lastmod);
-		dbglog($event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages.");
+		//dbglog($event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages.");
 	}
 
 	/**
@@ -145,14 +145,20 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	public function handle_sitemap_generate_after(Doku_Event $event, $param) {
 		// $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already contains all public pages of the wiki
 		// $event→data['sitemap']: The path of the file the sitemap will be saved to.
-
-		dbglog($event->data['items'], "createSpatialSitemap loading helper");
 		if ($helper = & plugin_load('helper', 'spatialhelper_sitemap')) {
 			dbglog($helper, "createSpatialSitemap loaded helper.");
 
 			$kml = $helper->createKMLSitemap($this->getConf('media_kml'));
 			$rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
-
+			
+			if (!empty ($this->getConf('sitemap_namespaces'))) {
+				$namespaces = array_map('trim',explode("\n",$this->getConf('sitemap_namespaces')));
+				foreach ($namespaces as $namespace) {
+					dbglog($namespace, "handle_sitemap_generate_after, create sitemap for: ");
+					$kmlN = $helper->createKMLSitemap($namespace . $this->getConf('media_kml'));
+					$rssN = $helper->createGeoRSSSitemap($namespace . $this->getConf('media_georss'));
+				}  
+			}
 			return $kml && $rss;
 		} else {
 			dbglog($helper, "createSpatialSitemap NOT loaded helper.");

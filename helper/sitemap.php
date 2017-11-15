@@ -40,7 +40,6 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 * constructor, load spatial index.
 	 */
 	public function __construct() {
-		// parent::__construct();
 		global $conf;
 		$idx_dir = $conf['indexdir'];
 		if (!@file_exists($idx_dir . '/spatial.idx')) {
@@ -82,6 +81,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 */
 	public function createGeoRSSSitemap($mediaID) {
 		global $conf;
+		$namespace = getNS($mediaID);
 
 		$idTag = 'tag:' . parse_url(DOKU_URL, PHP_URL_HOST) . ',';
 
@@ -111,12 +111,8 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 			foreach ($idxEntry as $id) {
 				// for document item in the index
 				if (strpos($id, 'media__', 0) !== 0) {
-					// public and non-hidden pages only
-					if (isHiddenPage($id)) {
-											continue;
-					}
-					if (auth_aclcheck($id, '', '') < AUTH_READ) {
-											continue;
+					if ($this->_skipPage($id, $namespace)) {
+						continue;
 					}
 
 					$meta = p_get_metadata($id);
@@ -157,6 +153,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 	 */
 	public function createKMLSitemap($mediaID) {
 		global $conf;
+		$namespace = getNS($mediaID);
 
 		$KMLstart = '<?xml version="1.0" encoding="UTF-8"?>' . DOKU_LF;
 		$KMLstart .= '<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:atom="http://www.w3.org/2005/Atom"';
@@ -182,12 +179,8 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 			foreach ($idxEntry as $id) {
 				// for document item in the index
 				if (strpos($id, 'media__', 0) !== 0) {
-					// public and non-hidden pages only
-					if (isHiddenPage($id)) {
-											continue;
-					}
-					if (auth_aclcheck($id, '', '') < AUTH_READ) {
-											continue;
+					if ($this->_skipPage($id, $namespace)) {
+						continue;
 					}
 
 					$meta = p_get_metadata($id);
@@ -221,5 +214,26 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
 		}
 		fwrite($fh, $KMLend);
 		return fclose($fh);
+	}
+	/**
+	 * will return true for non-public or hidden pages or pages that are not below or in the namespace.
+	 */
+	private function _skipPage($id, $namespace) {
+		dbglog("helper_plugin_spatialhelper_sitemap::_skipPage, check for $id in $namespace");
+		if (isHiddenPage($id)) {
+			return true;
+		}
+		if (auth_aclcheck($id, '', '') < AUTH_READ) {
+			return true;
+		}
+
+		if (!empty($namespace)) {
+			// only if id is in or below namespace
+			if (0 !== strpos(getNS($id), $namespace)) {
+				dbglog("helper_plugin_spatialhelper_sitemap::_skipPage, skipping $id, not in $namespace");
+				return true;
+			}
+		}
+		return false;
 	}
 }
