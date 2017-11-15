@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2014 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2017 Mark C. Prins <mprins@users.sf.net>
 *
 * Permission to use, copy, modify, and distribute this software for any
 * purpose with or without fee is hereby granted, provided that the above
@@ -22,3 +22,4 @@
  */
 $lang ['media_kml'] = '(namespaced) name of the KML sitemap of this wiki. (:sitemap.kml)';
 $lang ['media_georss'] = '(namespaced) name of the GeoRSS sitemap of this wiki. (:sitemap.georss)';
+$lang ['sitemap_namespaces'] = 'extra namespaces to generate KML / GeoRSS sitemaps for (1 namespace per line)';

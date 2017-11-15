@@ -49,7 +49,6 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
 	 * Constructor, initialises the spatial index.
 	 */
 	public function __construct() {
-		// parent::__construct ();
 		if (!$geophp = &plugin_load('helper', 'geophp')) {
 			$message = 'helper_plugin_spatialhelper_index::spatialhelper_index: geophp plugin is not available.';
 			msg($message, - 1);
