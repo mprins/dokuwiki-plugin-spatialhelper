@@ -152,11 +152,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			$rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
 			
 			if (!empty ($this->getConf('sitemap_namespaces'))) {
-				$namespaces = array_map('trim',explode("\n",$this->getConf('sitemap_namespaces')));
+				$namespaces = array_map('trim', explode("\n", $this->getConf('sitemap_namespaces')));
 				foreach ($namespaces as $namespace) {
 					$kmlN = $helper->createKMLSitemap($namespace . $this->getConf('media_kml'));
 					$rssN = $helper->createGeoRSSSitemap($namespace . $this->getConf('media_georss'));
-					dbglog( $kmlN && $rssN, "handle_sitemap_generate_after, created KML / GeoRSS sitemap in $namespace, succes: ");
+					dbglog($kmlN && $rssN, "handle_sitemap_generate_after, created KML / GeoRSS sitemap in $namespace, succes: ");
 				}  
 			}
 			return $kml && $rss;
