@@ -154,10 +154,9 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 			if (!empty ($this->getConf('sitemap_namespaces'))) {
 				$namespaces = array_map('trim',explode("\n",$this->getConf('sitemap_namespaces')));
 				foreach ($namespaces as $namespace) {
-					dbglog($namespace, "handle_sitemap_generate_after, create KML / GeoRSS sitemap for: ");
 					$kmlN = $helper->createKMLSitemap($namespace . $this->getConf('media_kml'));
 					$rssN = $helper->createGeoRSSSitemap($namespace . $this->getConf('media_georss'));
-					dbglog( $kmlN && $rssN, "handle_sitemap_generate_after, created KML / GeoRSS sitemap succes: ");
+					dbglog( $kmlN && $rssN, "handle_sitemap_generate_after, created KML / GeoRSS sitemap in $namespace, succes: ");
 				}  
 			}
 			return $kml && $rss;
