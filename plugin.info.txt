@@ -4,4 +4,4 @@ email  mprins@users.sf.net
 date   2018-01-27
 name   Spatial Helper plugin for DokuWiki
 desc   Provides spatial indexing and spatial search facilities.
-url    http://www.dokuwiki.org/plugin:spatialhelper
+url    https://www.dokuwiki.org/plugin:spatialhelper
