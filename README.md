@@ -8,7 +8,7 @@ If you install this plugin manually, make sure it is installed in lib/plugins/sp
 
 Please refer to http://www.dokuwiki.org/plugins for additional info on how to install plugins in DokuWiki.
 
-[![Build Status](https://travis-ci.org/mprins/dokuwiki-plugin-spatialhelper.svg?branch=master)](https://travis-ci.org/mprins/dokuwiki-plugin-spatialhelper)
+[![Build Status](https://travis-ci.com/mprins/dokuwiki-plugin-spatialhelper.svg?branch=master)](https://travis-ci.com/mprins/dokuwiki-plugin-spatialhelper)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mprins/dokuwiki-plugin-spatialhelper/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mprins/dokuwiki-plugin-spatialhelper/?branch=master)
 [![GitHub issues](https://img.shields.io/github/issues/mprins/dokuwiki-plugin-spatialhelper.svg)](https://github.com/mprins/dokuwiki-plugin-spatialhelper/issues)
 [![GitHub forks](https://img.shields.io/github/forks/mprins/dokuwiki-plugin-spatialhelper.svg)](https://github.com/mprins/dokuwiki-plugin-spatialhelper/network)
