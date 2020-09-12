@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2016 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2020 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,13 +17,11 @@
 if (!defined('DOKU_INC')) {
 	die ();
 }
-if (!defined('DOKU_PLUGIN')) {
-	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
-}
 if (!defined('DOKU_LF')) {
 	define('DOKU_LF', "\n");
 }
-require_once (DOKU_PLUGIN . 'action.php');
+
+use dokuwiki\Sitemap\Item;
 
 /**
  * DokuWiki Plugin dokuwikispatial (Action Component).
@@ -130,7 +128,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
 	public function handle_sitemap_generate_before(Doku_Event $event, $param) {
 		$path = mediaFN($this->getConf('media_kml'));
 		$lastmod = @filemtime($path);
-		$event->data ['items'] [] = new SitemapItem(ml($this->getConf('media_kml'), '', true, '&amp;', true), $lastmod);
+		$event->data ['items'] [] = new Item(ml($this->getConf('media_kml'), '', true, '&amp;', true), $lastmod);
 		//dbglog($event->data ['items'], "Added a new SitemapItem object that points to the KML of public geocoded pages.");
 	}
 
