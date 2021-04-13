@@ -14,13 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-if (!defined('DOKU_INC')) {
-	die ();
-}
-if (!defined('DOKU_PLUGIN')) {
-	define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
-}
-require_once DOKU_PLUGIN . 'admin.php';
+
 /**
  * DokuWiki Plugin spatialhelper (Admin Component).
  * This component purges and recreates the spatial index and sitemaps.
@@ -29,66 +23,66 @@ require_once DOKU_PLUGIN . 'admin.php';
  */
 class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
 
-	/**
-	 *
-	 * @see DokuWiki_Admin_Plugin::getMenuSort()
-	 */
-	public function getMenuSort() {
-		return 801;
-	}
-	/**
-	 * admin use only.
-	 *
-	 * @return true
-	 *
-	 * @see DokuWiki_Admin_Plugin::forAdminOnly()
-	 */
-	public function forAdminOnly() {
-		return true;
-	}
+    /**
+     *
+     * @see DokuWiki_Admin_Plugin::getMenuSort()
+     */
+    public function getMenuSort() {
+        return 801;
+    }
+    /**
+     * admin use only.
+     *
+     * @return true
+     *
+     * @see DokuWiki_Admin_Plugin::forAdminOnly()
+     */
+    public function forAdminOnly() {
+        return true;
+    }
 
-	/**
-	 * purge and regenerate the index and sitemaps.
-	 *
-	 * @see DokuWiki_Admin_Plugin::handle()
-	 */
-	public function handle() {
-		global $conf;
-		if (isset ($_REQUEST ['purgeindex'])) {
-			global $conf;
-			$path = $conf ['indexdir'] . '/spatial.idx';
-			if (file_exists($path)) {
-				if (unlink($path)) {
-					msg($this->getLang('admin_purged_tiles'), 0);
-				}
-			}
-		}
+    /**
+     * purge and regenerate the index and sitemaps.
+     *
+     * @see DokuWiki_Admin_Plugin::handle()
+     */
+    public function handle() {
+        global $conf;
+        if (isset ($_REQUEST ['purgeindex'])) {
+            global $conf;
+            $path = $conf ['indexdir'] . '/spatial.idx';
+            if (file_exists($path)) {
+                if (unlink($path)) {
+                    msg($this->getLang('admin_purged_tiles'), 0);
+                }
+            }
+        }
 
-		$indexer = plugin_load('helper', 'spatialhelper_index');
-		$indexer->generateSpatialIndex();
+        $indexer = plugin_load('helper', 'spatialhelper_index');
+        $indexer->generateSpatialIndex();
 
-		$sitemapper = plugin_load('helper', 'spatialhelper_sitemap');
-		$sitemapper->createKMLSitemap($this->getConf('media_kml'));
-		$sitemapper->createGeoRSSSitemap($this->getConf('media_georss'));
-	}
+        $sitemapper = plugin_load('helper', 'spatialhelper_sitemap');
+        $sitemapper->createKMLSitemap($this->getConf('media_kml'));
+        $sitemapper->createGeoRSSSitemap($this->getConf('media_georss'));
+    }
 
-	/**
-	 * render the form for this plugin.
-	 *
-	 * @see DokuWiki_Admin_Plugin::html()
-	 */
-	public function html() {
-		echo $this->locale_xhtml('admin_purge_intro');
+    /**
+     * render the form for this plugin.
+     *
+     * @see DokuWiki_Admin_Plugin::html()
+     */
+    public function html() {
+        echo $this->locale_xhtml('admin_purge_intro');
 
-		$form = new Doku_Form(array(
-				'id' => 'spatialhelper__purgeform',
-				'method' => 'post'
-		));
-		$form->addHidden('purgeindex', 'true');
+        $form = new Doku_Form(array(
+                'id' => 'spatialhelper__purgeform',
+                'method' => 'post'
+        ));
+        $form->addHidden('purgeindex', 'true');
 
-		$form->addElement(form_makeButton('submit', 'admin', $this->getLang('admin_submit'), array(
-				'title' => $this->getLang('admin_submit')
-		)));
-		$form->printForm();
-	}
+        $form->addElement(form_makeButton('submit', 'admin', $this->getLang('admin_submit'), array(
+                'title' => $this->getLang('admin_submit')
+        )));
+        $form->printForm();
+    }
 }
