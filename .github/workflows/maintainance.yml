@@ -13,5 +13,5 @@ jobs:
         with:
           github-token: ${{ github.token }}
           issue-lock-inactive-days: '90'
-          issue-exclude-labels: 'upstream, help-wanted'
+          issue-exclude-labels: 'enhancement, help-wanted'
           pr-lock-inactive-days: '60'
