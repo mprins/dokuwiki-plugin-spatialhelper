@@ -28,7 +28,7 @@ class general_plugin_spatialhelper_test extends DokuWikiTest {
     /**
      * Simple test to make sure the plugin.info.txt is in correct format.
      */
-    public function test_plugininfo() {
+    public function test_plugininfo(): void {
         $file = __DIR__ . '/../plugin.info.txt';
         $this->assertFileExists($file);
 
@@ -52,11 +52,10 @@ class general_plugin_spatialhelper_test extends DokuWikiTest {
     /**
      * test if plugin is loaded.
      */
-    public function test_plugin_spatialhelper_isloaded() {
+    public function test_plugin_spatialhelper_isloaded(): void {
         global $plugin_controller;
-        $this->assertTrue(
-            in_array('spatialhelper', $plugin_controller->getList()),
-            "spatialhelper plugin is loaded"
+        $this->assertContains(
+            'spatialhelper', $plugin_controller->getList(), "spatialhelper plugin is loaded"
         );
     }
 }

@@ -18,7 +18,7 @@
 /**
  * English language file for spatialhelper plugin.
  *
- * @author mark
+ * @author  mark
  * @license BSD license
  */
 $lang ['nothingfound'] = 'Nothing found.';
@@ -27,13 +27,13 @@ $lang ['invalidinput'] = 'No valid input was given.';
 $lang ['search_findnearby'] = 'Search pages and media nearby';
 $lang ['search_largerarea'] = 'Search in a larger area';
 
-$lang ['results_header'] = 'Searchresults';
-$lang ['results_pages'] = 'Pages nearby';
-$lang ['results_media'] = 'Media nearby';
+$lang ['results_header']          = 'Searchresults';
+$lang ['results_pages']           = 'Pages nearby';
+$lang ['results_media']           = 'Media nearby';
 $lang ['results_distance_prefix'] = 'Beeline distance:&nbsp;';
-$lang ['results_precision'] = 'Accuracy:&nbsp;';
+$lang ['results_precision']       = 'Accuracy:&nbsp;';
 
-$lang ['admin_submit'] = 'Purge spatial index';
+$lang ['admin_submit']       = 'Purge spatial index';
 $lang ['admin_purged_tiles'] = 'Spatial index was purged.';
 
 $lang ['menu'] = 'Spatial index and sitemap manager';

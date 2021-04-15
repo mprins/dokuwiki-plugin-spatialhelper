@@ -19,7 +19,7 @@
  * DokuWiki Plugin dokuwikispatial (findnearby Syntax Component).
  *
  * @license BSD license
- * @author Mark C. Prins <mprins@users.sf.net>
+ * @author  Mark C. Prins <mprins@users.sf.net>
  */
 class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
     /**
@@ -62,23 +62,23 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      * @see DokuWiki_Syntax_Plugin::handle()
      */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
-        $data = array();
-        $data [0] = trim(substr($match, strlen('{{findnearby>'), - 2));
-        if (strlen($data [0]) < 1) {
+        $data     = array();
+        $data [0] = trim(substr($match, strlen('{{findnearby>'), -2));
+        if(strlen($data [0]) < 1) {
             $data [0] = $this->getLang('search_findnearby');
         }
         $meta = p_get_metadata(getID(), 'geo');
-        if ($meta) {
-            if ($meta ['lat'] && $meta ['lon']) {
+        if($meta) {
+            if($meta ['lat'] && $meta ['lon']) {
                 $data [1] = array(
-                        'do' => 'findnearby',
-                        'lat' => $meta ['lat'],
-                        'lon' => $meta ['lon']
+                    'do'  => 'findnearby',
+                    'lat' => $meta ['lat'],
+                    'lon' => $meta ['lon']
                 );
-            } elseif ($meta ['geohash']) {
+            } elseif($meta ['geohash']) {
                 $data [1] = array(
-                        'do' => 'findnearby',
-                        'geohash' => $meta ['geohash']
+                    'do'      => 'findnearby',
+                    'geohash' => $meta ['geohash']
                 );
             }
             return $data;
@@ -92,16 +92,16 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      * @see DokuWiki_Syntax_Plugin::render()
      */
     public function render($mode, Doku_Renderer $renderer, $data) {
-        if ($data === false) {
-                    return false;
+        if($data === false) {
+            return false;
         }
 
-        if ($mode == 'xhtml') {
+        if($mode == 'xhtml') {
             $renderer->doc .= '<a href="' . wl(getID(), $data [1]) . '" class="findnearby">' . hsc($data [0]) . '</a>';
             return true;
-        } elseif ($mode == 'metadata') {
+        } elseif($mode == 'metadata') {
             return false;
-        } elseif ($mode == 'odt') {
+        } elseif($mode == 'odt') {
             // don't render anything in ODT
             return false;
         }
