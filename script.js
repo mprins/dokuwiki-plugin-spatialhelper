@@ -1,4 +1,3 @@
-
 // spatial search via ajax
 
 /*

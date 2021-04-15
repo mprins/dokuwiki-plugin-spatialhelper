@@ -30,6 +30,7 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
     public function getMenuSort() {
         return 801;
     }
+
     /**
      * admin use only.
      *
@@ -48,11 +49,11 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
      */
     public function handle() {
         global $conf;
-        if (isset ($_REQUEST ['purgeindex'])) {
+        if(isset ($_REQUEST ['purgeindex'])) {
             global $conf;
             $path = $conf ['indexdir'] . '/spatial.idx';
-            if (file_exists($path)) {
-                if (unlink($path)) {
+            if(file_exists($path)) {
+                if(unlink($path)) {
                     msg($this->getLang('admin_purged_tiles'), 0);
                 }
             }
@@ -74,15 +75,21 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
     public function html() {
         echo $this->locale_xhtml('admin_purge_intro');
 
-        $form = new Doku_Form(array(
-                'id' => 'spatialhelper__purgeform',
+        $form = new Doku_Form(
+            array(
+                'id'     => 'spatialhelper__purgeform',
                 'method' => 'post'
-        ));
+            )
+        );
         $form->addHidden('purgeindex', 'true');
 
-        $form->addElement(form_makeButton('submit', 'admin', $this->getLang('admin_submit'), array(
+        $form->addElement(
+            form_makeButton(
+                'submit', 'admin', $this->getLang('admin_submit'), array(
                 'title' => $this->getLang('admin_submit')
-        )));
+            )
+            )
+        );
         $form->printForm();
     }
 }

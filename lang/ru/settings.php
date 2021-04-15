@@ -21,6 +21,6 @@
  * @license BSD license
  * @author  Aleksej Kozlov <nellesmeti@gmail.com>
  */
-$lang ['media_kml'] = 'Имя (с указанием пространства имён) карты сайта в формате KML. (:sitemap.kml)';
-$lang ['media_georss'] = 'Имя (с указанием пространства имён) карты сайта в формате GeoRSS. (:sitemap.georss)';
+$lang ['media_kml']          = 'Имя (с указанием пространства имён) карты сайта в формате KML. (:sitemap.kml)';
+$lang ['media_georss']       = 'Имя (с указанием пространства имён) карты сайта в формате GeoRSS. (:sitemap.georss)';
 $lang ['sitemap_namespaces'] = 'Дополнительные пространства имён для карт сайта в формате KML / GeoRSS (по одному на строке)';
