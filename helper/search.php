@@ -62,7 +62,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         if(!$geophp = &plugin_load('helper', 'geophp')) {
             $message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
             msg($message, -1);
-            return "";
         }
 
         $idx_dir = $conf ['indexdir'];
