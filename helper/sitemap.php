@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-if(!defined('DOKU_LF')) {
-    define('DOKU_LF', "\n");
-}
-
 /**
  * DokuWiki Plugin spatialhelper (sitemap Component).
  *
@@ -44,7 +40,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
         $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
     }
 
-    public function getMethods() {
+    public function getMethods(): array {
         $result[] = array(
             'name'   => 'createGeoRSSSitemap',
             'desc'   => 'create a spatial sitemap in GeoRSS format.',
@@ -71,10 +67,10 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
     /**
      * Create a GeoRSS Simple sitemap (Atom).
      *
-     * @param $mediaID id
-     *                 for the GeoRSS file
+     * @param string $mediaID id
+     *                        for the GeoRSS file
      */
-    public function createGeoRSSSitemap($mediaID) {
+    public function createGeoRSSSitemap(string $mediaID): bool {
         global $conf;
         $namespace = getNS($mediaID);
 
@@ -147,12 +143,12 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
     /**
      * will return true for non-public or hidden pages or pages that are not below or in the namespace.
      */
-    private function skipPage($id, $namespace) {
+    private function skipPage(string $id, string $namespace): bool {
         dbglog("helper_plugin_spatialhelper_sitemap::skipPage, check for $id in $namespace");
         if(isHiddenPage($id)) {
             return true;
         }
-        if(auth_aclcheck($id, '', '') < AUTH_READ) {
+        if(auth_aclcheck($id, '', null) < AUTH_READ) {
             return true;
         }
 
@@ -169,10 +165,9 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
     /**
      * Create a KML sitemap.
      *
-     * @param $mediaID id
-     *                 for the KML file
+     * @param string $mediaID id for the KML file
      */
-    public function createKMLSitemap($mediaID) {
+    public function createKMLSitemap(string $mediaID): bool {
         global $conf;
         $namespace = getNS($mediaID);
 
@@ -221,7 +216,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                     $plcm .= '  <atom:link href="' . wl($id, '' . true) . '" rel="alternate" type="text/html" />'
                         . DOKU_LF;
                     if(!empty($meta['creator'])) {
-                        $entry .= '  <atom:author><atom:name>' . $meta['creator'] . '</atom:name></atom:author>'
+                        $plcm .= '  <atom:author><atom:name>' . $meta['creator'] . '</atom:name></atom:author>'
                             . DOKU_LF;
                     }
 

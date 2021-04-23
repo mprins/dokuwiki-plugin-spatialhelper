@@ -59,7 +59,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         // parent::__construct ();
         global $conf;
 
-        if(!$geophp = &plugin_load('helper', 'geophp')) {
+        if(!$geophp = plugin_load('helper', 'geophp')) {
             $message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
             msg($message, -1);
         }
@@ -75,12 +75,12 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
     /**
      * Find locations based on the coordinate pair.
      *
-     * @param numeric $lat
+     * @param float $lat
      *          The y coordinate (or latitude)
-     * @param numeric $lon
+     * @param float $lon
      *          The x coordinate (or longitude)
      */
-    public function findNearbyLatLon($lat, $lon) {
+    public function findNearbyLatLon(float $lat, float $lon): array {
         $geometry = new Point($lon, $lat);
         return $this->findNearby($geometry->out('geohash'), $geometry);
     }
@@ -94,7 +94,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      *          optional point
      * @return array of ...
      */
-    public function findNearby($geohash, Point $p = null) {
+    public function findNearby(string $geohash, Point $p = null): array {
         $_geohashClass = new Geohash();
         if(!$p) {
             $decodedPoint = $_geohashClass->read($geohash);
@@ -120,7 +120,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         foreach($adjacent as $adjHash) {
             if(is_array($this->spatial_idx)) {
                 foreach($this->spatial_idx as $_geohash => $_docIds) {
-                    if(strstr($_geohash, $adjHash)) {
+                    if(strpos($_geohash, $adjHash) !== false) {
                         // dbglog ( "Found adjacent geo hash: $adjHash in $_geohash" );
                         // if $adjHash similar to geohash
                         $docIds = array_merge($docIds, $_docIds);
@@ -179,12 +179,12 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
 
         // sort all the pages/media using distance
         usort(
-            $pages, function ($a, $b) {
+            $pages, static function ($a, $b) {
             return strnatcmp($a ['distance'], $b ['distance']);
         }
         );
         usort(
-            $media, function ($a, $b) {
+            $media, static function ($a, $b) {
             return strnatcmp($a ['distance'], $b ['distance']);
         }
         );

@@ -20,7 +20,7 @@ class index_test extends DokuWikiTest {
      * @see index_test::test_convertDMStoD
      *
      */
-    public static function convertDMStoD_testdata(): array {
+    public static function convertDMStoDTestdata(): array {
         return array(
             array(
                 array(0 => '52/1', 1 => '31/1', 2 => '2/1', 3 => 'N',),
@@ -46,15 +46,14 @@ class index_test extends DokuWikiTest {
     }
 
     /**
-     * @dataProvider convertDMStoD_testdata
-     *
+     * @dataProvider convertDMStoDTestdata
      */
-    public function test_convertDMStoD($input, $expected_output, $msg): void {
-        /** @var helper_plugin_spatialhelper_index $index */
+    public function test_convertDMStoD(array $input, float $expected_output, string $msg): void {
         $index = plugin_load('helper', 'spatialhelper_index');
+        assert($index instanceof helper_plugin_spatialhelper_index);
 
         $actual_output = $index->convertDMStoD($input);
 
-        $this->assertEqualsWithDelta($expected_output, $actual_output, 0.0001, $msg);
+        self::assertEqualsWithDelta($expected_output, $actual_output, 0.0001, $msg);
     }
 }

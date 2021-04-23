@@ -26,7 +26,7 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      *
      * @see DokuWiki_Syntax_Plugin::getType()
      */
-    public function getType() {
+    public function getType(): string {
         return 'substition';
     }
 
@@ -35,7 +35,7 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      *
      * @see DokuWiki_Syntax_Plugin::getPType()
      */
-    public function getPType() {
+    public function getPType(): string {
         return 'normal';
     }
 
@@ -43,7 +43,7 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      *
      * @see Doku_Parser_Mode::getSort()
      */
-    public function getSort() {
+    public function getSort(): int {
         return 307;
     }
 
@@ -52,12 +52,18 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      *
      * @see Doku_Parser_Mode::connectTo()
      */
-    public function connectTo($mode) {
+    public function connectTo($mode): void {
         $this->Lexer->addSpecialPattern('\{\{findnearby>.*?\}\}', $mode, 'plugin_spatialhelper_findnearby');
     }
 
     /**
      * look up the page's geo metadata and pass that on to render.
+     *
+     * @param string       $match   The text matched by the patterns
+     * @param int          $state   The lexer state for the match
+     * @param int          $pos     The character position of the matched text
+     * @param Doku_Handler $handler The Doku_Handler object
+     * @return  bool|array Return an array with all data you want to use in render, false don't add an instruction
      *
      * @see DokuWiki_Syntax_Plugin::handle()
      */
@@ -91,17 +97,17 @@ class syntax_plugin_spatialhelper_findnearby extends DokuWiki_Syntax_Plugin {
      *
      * @see DokuWiki_Syntax_Plugin::render()
      */
-    public function render($mode, Doku_Renderer $renderer, $data) {
+    public function render($format, Doku_Renderer $renderer, $data): bool {
         if($data === false) {
             return false;
         }
 
-        if($mode == 'xhtml') {
+        if($format === 'xhtml') {
             $renderer->doc .= '<a href="' . wl(getID(), $data [1]) . '" class="findnearby">' . hsc($data [0]) . '</a>';
             return true;
-        } elseif($mode == 'metadata') {
+        } elseif($format === 'metadata') {
             return false;
-        } elseif($mode == 'odt') {
+        } elseif($format === 'odt') {
             // don't render anything in ODT
             return false;
         }
