@@ -46,10 +46,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * Constructor, initialises the spatial index.
      */
     public function __construct() {
-        if(!$geophp = &plugin_load('helper', 'geophp')) {
+        if(!$geophp = plugin_load('helper', 'geophp')) {
             $message = 'helper_plugin_spatialhelper_index::spatialhelper_index: geophp plugin is not available.';
             msg($message, -1);
-            return "";
         }
 
         global $conf;
@@ -69,7 +68,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *
      * @todo add an option to erase the old index
      */
-    public function generateSpatialIndex() {
+    public function generateSpatialIndex(): bool {
         global $conf;
         require_once(DOKU_INC . 'inc/search.php');
         $pages = array();
@@ -93,8 +92,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *
      * @param string $id
      *          the document ID
+     * @throws Exception
      */
-    public function updateSpatialIndex($id) {
+    public function updateSpatialIndex(string $id): bool {
         $geotags = p_get_metadata($id, 'geo');
         if(empty ($geotags)) {
             return false;
@@ -106,7 +106,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
         $geometry = new Point($geotags ['lon'], $geotags ['lat']);
         $geohash  = $geometry->out('geohash');
         dbglog('Update index for geohash: ' . $geohash);
-        $succes = $this->addToIndex($geohash, $id);
+        return $this->addToIndex($geohash, $id);
     }
 
     /**
@@ -115,9 +115,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * @param string $geohash
      * @param string $id
      *          page or media id
-     * @return boolean true when succesful
+     * @return bool true when succesful
      */
-    private function addToIndex($geohash, $id) {
+    private function addToIndex(string $geohash, string $id): bool {
         $pageIds = array();
         // check index for key/geohash
         if(!array_key_exists($geohash, $this->spatial_idx)) {
@@ -135,7 +135,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             // TODO shortcut, need to make sure there is only one element, if not the index is corrupt
             $knownHash = $knownHashes [0];
 
-            if($knownHash == $geohash) {
+            if($knownHash === $geohash) {
                 dbglog("Document $id was found in index and has the same geohash, nothing to do.");
                 return true;
             }
@@ -167,7 +167,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * @param array  $index
      *          spatial index
      */
-    public function findHashesForId($id, $index) {
+    public function findHashesForId(string $id, array $index): array {
         $hashes = array();
         foreach($index as $hash => $docIds) {
             if(in_array($id, $docIds, false)) {
@@ -181,23 +181,25 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
     /**
      * Save spatial index.
      */
-    private function saveIndex() {
+    private function saveIndex(): bool {
         return io_saveFile($this->idx_dir . '/spatial.idx', serialize($this->spatial_idx));
     }
 
     /**
      * Add an index entry for this file having EXIF / IPTC data.
      *
-     * @param unknown_type $img Dokuwiki image
-     * @return boolean true when image was succesfully added to the index.
+     * @param $img
+     *          a Dokuwiki image
+     * @return bool true when image was succesfully added to the index.
+     * @throws Exception
+     * @see http://www.php.net/manual/en/function.iptcparse.php
      * @see http://php.net/manual/en/function.exif-read-data.php
      *
-     * @see http://www.php.net/manual/en/function.iptcparse.php
      */
-    public function indexImage($img) {
+    public function indexImage($img): bool {
         // test for supported files (jpeg only)
         if(
-            (substr($img ['file'], -strlen('.jpg')) !== '.jpg') and
+            (substr($img ['file'], -strlen('.jpg')) !== '.jpg') &&
             (substr($img ['file'], -strlen('.jpeg')) !== '.jpeg')) {
             return false;
         }
@@ -216,11 +218,11 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
     /**
      * retrieve GPS decimal coordinates from exif.
      *
-     * @param
-     *          $id
-     * @return Point or false
+     * @param string $id
+     * @return Point|false
+     * @throws Exception
      */
-    public function getCoordsFromExif($id) {
+    public function getCoordsFromExif(string $id) {
         $exif = exif_read_data(mediaFN($id), 0, true);
         if(empty ($exif ['GPS'])) {
             return false;
@@ -251,9 +253,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * convert DegreesMinutesSeconds to Decimal degrees.
      *
      * @param array $param array of rational DMS
-     * @return number
+     * @return float
      */
-    public function convertDMStoD($param) {
+    public function convertDMStoD(array $param): float {
         if(!is_array($param)) {
             $param = array($param);
         }
@@ -265,23 +267,22 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
         return $hem * ($deg + $min + $sec);
     }
 
-    public function convertRationaltoFloat($param) {
+    public function convertRationaltoFloat($param): float {
         // rational64u
         $nums = explode('/', $param);
-        if(intval($nums[1]) > 0) {
-            return intval($nums[0]) / intval($nums[1]);
+        if((int) $nums[1] > 0) {
+            return (float) $nums[0] / (int) $nums[1];
         } else {
-            return intval($nums[0]);
+            return (float) $nums[0];
         }
     }
 
     /**
      * Deletes the page from the index.
      *
-     * @param String $id
-     *          document ID
+     * @param string $id document ID
      */
-    public function deleteFromIndex($id) {
+    public function deleteFromIndex(string $id): void {
         // check the index for document
         $knownHashes = $this->findHashesForId($id, $this->spatial_idx);
         if(empty ($knownHashes)) {
@@ -299,6 +300,6 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             // dbglog ( "removing key: $knownHash from the index." );
             unset ($this->spatial_idx [$knownHash]);
         }
-        $succes = $this->saveIndex();
+        $this->saveIndex();
     }
 }
