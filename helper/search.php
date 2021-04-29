@@ -15,13 +15,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+use dokuwiki\Logger;
+
 /**
  * DokuWiki Plugin spatialhelper (Search component).
  *
  * @license BSD license
  * @author  Mark Prins
  */
-class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
+class helper_plugin_spatialhelper_search extends DokuWiki_Plugin
+{
     /**
      * spatial index.
      *
@@ -55,17 +58,18 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
     /**
      * constructor; initialize/load spatial index.
      */
-    public function __construct() {
+    public function __construct()
+    {
         // parent::__construct ();
         global $conf;
 
-        if(!$geophp = plugin_load('helper', 'geophp')) {
+        if (!$geophp = plugin_load('helper', 'geophp')) {
             $message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
             msg($message, -1);
         }
 
         $idx_dir = $conf ['indexdir'];
-        if(!@file_exists($idx_dir . '/spatial.idx')) {
+        if (!@file_exists($idx_dir . '/spatial.idx')) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
         }
 
@@ -80,8 +84,9 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      * @param float $lon
      *          The x coordinate (or longitude)
      */
-    public function findNearbyLatLon(float $lat, float $lon): array {
-        $geometry = new geoPHP\Geometry\Point($lon, $lat);
+    public function findNearbyLatLon(float $lat, float $lon): array
+    {
+        $geometry = new Point($lon, $lat);
         return $this->findNearby($geometry->out('geohash'), $geometry);
     }
 
@@ -90,38 +95,40 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      * returns a list of documents and the bunding box.
      *
      * @param string $geohash
-     * @param geoPHP\Geometry\Point  $p
+     * @param Point $p
      *          optional point
      * @return array of ...
      */
-    public function findNearby(string $geohash, geoPHP\Geometry\Point $p = null): array {
-        $_geohashClass = new geoPHP\Adapter\Geohash();
-        if(!$p) {
+    public function findNearby(string $geohash, Point $p = null): array
+    {
+        $_geohashClass = new Geohash();
+        if (!$p) {
             $decodedPoint = $_geohashClass->read($geohash);
         } else {
             $decodedPoint = $p;
         }
 
         // find adjacent blocks
-        $adjacent                 = array();
-        $adjacent ['center']      = $geohash;
-        $adjacent ['top']         = $_geohashClass->adjacent($adjacent ['center'], 'top');
-        $adjacent ['bottom']      = $_geohashClass->adjacent($adjacent ['center'], 'bottom');
-        $adjacent ['right']       = $_geohashClass->adjacent($adjacent ['center'], 'right');
-        $adjacent ['left']        = $_geohashClass->adjacent($adjacent ['center'], 'left');
-        $adjacent ['topleft']     = $_geohashClass->adjacent($adjacent ['left'], 'top');
-        $adjacent ['topright']    = $_geohashClass->adjacent($adjacent ['right'], 'top');
+        $adjacent = array();
+        $adjacent ['center'] = $geohash;
+        $adjacent ['top'] = $_geohashClass->adjacent($adjacent ['center'], 'top');
+        $adjacent ['bottom'] = $_geohashClass->adjacent($adjacent ['center'], 'bottom');
+        $adjacent ['right'] = $_geohashClass->adjacent($adjacent ['center'], 'right');
+        $adjacent ['left'] = $_geohashClass->adjacent($adjacent ['center'], 'left');
+        $adjacent ['topleft'] = $_geohashClass->adjacent($adjacent ['left'], 'top');
+        $adjacent ['topright'] = $_geohashClass->adjacent($adjacent ['right'], 'top');
         $adjacent ['bottomright'] = $_geohashClass->adjacent($adjacent ['right'], 'bottom');
-        $adjacent ['bottomleft']  = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
-        dbglog($adjacent, "adjacent geo hashes:");
+        $adjacent ['bottomleft'] = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
+        Logger::debug("adjacent geo hashes", $adjacent);
 
         // find all the pages in the index that overlap with the adjacent hashes
         $docIds = array();
-        foreach($adjacent as $adjHash) {
-            if(is_array($this->spatial_idx)) {
-                foreach($this->spatial_idx as $_geohash => $_docIds) {
-                    if(strpos($_geohash, $adjHash) !== false) {
-                        // dbglog ( "Found adjacent geo hash: $adjHash in $_geohash" );
+        foreach ($adjacent as $adjHash) {
+            if (is_array($this->spatial_idx)) {
+                foreach ($this->spatial_idx as $_geohash => $_docIds) {
+                    if (strpos($_geohash, $adjHash) !== false) {
+                        // Logger::getInstance(Logger::LOG_DEBUG)
+                        //      ->log("Found adjacent geo hash: $adjHash in $_geohash" );
                         // if $adjHash similar to geohash
                         $docIds = array_merge($docIds, $_docIds);
                     }
@@ -129,48 +136,48 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
             }
         }
         $docIds = array_unique($docIds);
-        dbglog($docIds, "found docIDs");
+        Logger::debug("found docIDs", $docIds);
 
         // create associative array of pages + calculate distance
-        $pages   = array();
-        $media   = array();
+        $pages = array();
+        $media = array();
         $indexer = plugin_load('helper', 'spatialhelper_index');
 
-        foreach($docIds as $id) {
-            if(strpos($id, 'media__', 0) === 0) {
+        foreach ($docIds as $id) {
+            if (strpos($id, 'media__', 0) === 0) {
                 $id = substr($id, strlen('media__'));
-                if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
-                    $point    = $indexer->getCoordsFromExif($id);
-                    $line     = new geoPHP\Geometry\LineString(
+                if (auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
+                    $point = $indexer->getCoordsFromExif($id);
+                    $line = new LineString(
                         [
                             $decodedPoint,
                             $point
                         ]
                     );
                     $media [] = array(
-                        'id'       => $id,
-                        'distance' => (int) ($line->greatCircleLength()),
-                        'lat'      => $point->y(),
-                        'lon'      => $point->x()
+                        'id' => $id,
+                        'distance' => (int)($line->greatCircleLength()),
+                        'lat' => $point->y(),
+                        'lon' => $point->x()
                         // optionally add other meta such as tag, description...
                     );
                 }
             } else {
-                if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
+                if (auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $geotags  = p_get_metadata($id, 'geo');
-                    $point    = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
-                    $line     = new geoPHP\Geometry\LineString(
+                    $point    = new Point($geotags ['lon'], $geotags ['lat']);
+                    $line     = new LineString(
                         [
                             $decodedPoint,
                             $point
                         ]
                     );
                     $pages [] = array(
-                        'id'          => $id,
-                        'distance'    => (int) ($line->greatCircleLength()),
+                        'id' => $id,
+                        'distance' => (int)($line->greatCircleLength()),
                         'description' => p_get_metadata($id, 'description')['abstract'],
-                        'lat'         => $geotags ['lat'],
-                        'lon'         => $geotags ['lon']
+                        'lat' => $geotags ['lat'],
+                        'lon' => $geotags ['lon']
                         // optionally add other meta such as tag...
                     );
                 }
@@ -190,11 +197,11 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         );
 
         return array(
-            'pages'     => $pages,
-            'media'     => $media,
-            'lat'       => $decodedPoint->y(),
-            'lon'       => $decodedPoint->x(),
-            'geohash'   => $geohash,
+            'pages' => $pages,
+            'media' => $media,
+            'lat' => $decodedPoint->y(),
+            'lon' => $decodedPoint->x(),
+            'geohash' => $geohash,
             'precision' => $this->precision [strlen($geohash)]
         );
     }

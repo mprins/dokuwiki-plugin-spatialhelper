@@ -15,13 +15,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+use dokuwiki\Logger;
+
 /**
  * DokuWiki Plugin spatialhelper (index component).
  *
  * @license BSD license
  * @author  Mark Prins
  */
-class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
+class helper_plugin_spatialhelper_index extends DokuWiki_Plugin
+{
     /**
      * directory for index files.
      *
@@ -45,8 +48,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
     /**
      * Constructor, initialises the spatial index.
      */
-    public function __construct() {
-        if(!$geophp = plugin_load('helper', 'geophp')) {
+    public function __construct()
+    {
+        if (!$geophp = plugin_load('helper', 'geophp')) {
             $message = 'helper_plugin_spatialhelper_index::spatialhelper_index: geophp plugin is not available.';
             msg($message, -1);
         }
@@ -54,12 +58,12 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
         global $conf;
         $this->idx_dir = $conf ['indexdir'];
         // test if there is a spatialindex, if not build one for the wiki
-        if(!@file_exists($this->idx_dir . '/spatial.idx')) {
+        if (!@file_exists($this->idx_dir . '/spatial.idx')) {
             // creates and stores the index
             $this->generateSpatialIndex();
         } else {
             $this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false));
-            dbglog($this->spatial_idx, 'done loading spatial index');
+            Logger::debug('done loading spatial index', $this->spatial_idx);
         }
     }
 
@@ -68,19 +72,20 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *
      * @todo add an option to erase the old index
      */
-    public function generateSpatialIndex(): bool {
+    public function generateSpatialIndex(): bool
+    {
         global $conf;
         require_once(DOKU_INC . 'inc/search.php');
         $pages = array();
         search($pages, $conf ['datadir'], 'search_allpages', array());
-        foreach($pages as $page) {
+        foreach ($pages as $page) {
             $this->updateSpatialIndex($page ['id']);
         }
         // media
         $media = array();
         search($media, $conf ['mediadir'], 'search_media', array());
-        foreach($media as $medium) {
-            if($medium ['isimg']) {
+        foreach ($media as $medium) {
+            if ($medium ['isimg']) {
                 $this->indexImage($medium);
             }
         }
@@ -94,18 +99,19 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *          the document ID
      * @throws Exception
      */
-    public function updateSpatialIndex(string $id): bool {
+    public function updateSpatialIndex(string $id): bool
+    {
         $geotags = p_get_metadata($id, 'geo');
-        if(empty ($geotags)) {
+        if (empty ($geotags)) {
             return false;
         }
-        if(empty ($geotags ['lon']) || empty ($geotags ['lat'])) {
+        if (empty ($geotags ['lon']) || empty ($geotags ['lat'])) {
             return false;
         }
-        dbglog($geotags, "Geo metadata found for page $id");
-        $geometry = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
-        $geohash  = $geometry->out('geohash');
-        dbglog('Update index for geohash: ' . $geohash);
+        Logger::debug("Geo metadata found for page $id", $geotags);
+        $geometry = new Point($geotags ['lon'], $geotags ['lat']);
+        $geohash = $geometry->out('geohash');
+        Logger::debug("Update index for geohash: $geohash");
         return $this->addToIndex($geohash, $id);
     }
 
@@ -117,40 +123,47 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *          page or media id
      * @return bool true when succesful
      */
-    private function addToIndex(string $geohash, string $id): bool {
+    private function addToIndex(string $geohash, string $id): bool
+    {
         $pageIds = array();
         // check index for key/geohash
-        if(!array_key_exists($geohash, $this->spatial_idx)) {
-            dbglog("Geohash $geohash not in index, just add $id.");
+        if (!array_key_exists($geohash, $this->spatial_idx)) {
+            Logger::debug("Geohash $geohash not in index, just add $id.");
             $pageIds [] = $id;
         } else {
-            dbglog('Geohash for document is in index, find it.');
+            Logger::debug('Geohash for document is in index, find it.');
             // check the index for document
             $knownHashes = $this->findHashesForId($id, $this->spatial_idx);
-            if(empty ($knownHashes)) {
-                dbglog("No index record found for document $id, just add");
-                $pageIds    = $this->spatial_idx [$geohash];
+            if (empty ($knownHashes)) {
+                Logger::debug(
+                    "No index record found for document $id, just add"
+                );
+                $pageIds = $this->spatial_idx [$geohash];
                 $pageIds [] = $id;
             }
             // TODO shortcut, need to make sure there is only one element, if not the index is corrupt
             $knownHash = $knownHashes [0];
 
-            if($knownHash === $geohash) {
-                dbglog("Document $id was found in index and has the same geohash, nothing to do.");
+            if ($knownHash === $geohash) {
+                Logger::debug(
+                    "Document $id was found in index and has the same geohash, nothing to do."
+                );
                 return true;
             }
 
-            if(!empty ($knownHash)) {
-                dbglog("Document/media $id was found in index but has different geohash (it moved).");
+            if (!empty ($knownHash)) {
+                Logger::debug(
+                    "Document/media $id was found in index but has different geohash (it moved)."
+                );
                 $knownIds = $this->spatial_idx [$knownHash];
-                dbglog($knownIds, "Known id's for this hash:");
+                Logger::debug("Known id's for this hash", $knownIds);
                 // remove it from the old geohash element
                 $i = array_search($id, $knownIds);
-                dbglog('Unsetting:' . $knownIds [$i]);
+                Logger::debug('Unsetting:' . $knownIds [$i]);
                 unset ($knownIds [$i]);
                 $this->spatial_idx [$knownHash] = $knownIds;
                 // set on new geohash element
-                $pageIds    = $this->spatial_idx [$geohash];
+                $pageIds = $this->spatial_idx [$geohash];
                 $pageIds [] = $id;
             }
         }
@@ -164,24 +177,26 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *
      * @param String $id
      *          document ID
-     * @param array  $index
+     * @param array $index
      *          spatial index
      */
-    public function findHashesForId(string $id, array $index): array {
+    public function findHashesForId(string $id, array $index): array
+    {
         $hashes = array();
-        foreach($index as $hash => $docIds) {
-            if(in_array($id, $docIds, false)) {
+        foreach ($index as $hash => $docIds) {
+            if (in_array($id, $docIds, false)) {
                 $hashes [] = $hash;
             }
         }
-        dbglog($hashes, "Found the following hashes for $id (should only be 1)");
+        Logger::debug("Found the following hashes for $id (should only be 1)", $hashes);
         return $hashes;
     }
 
     /**
      * Save spatial index.
      */
-    private function saveIndex(): bool {
+    private function saveIndex(): bool
+    {
         return io_saveFile($this->idx_dir . '/spatial.idx', serialize($this->spatial_idx));
     }
 
@@ -196,16 +211,17 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * @see http://php.net/manual/en/function.exif-read-data.php
      *
      */
-    public function indexImage($img): bool {
+    public function indexImage($img): bool
+    {
         // test for supported files (jpeg only)
-        if(
+        if (
             (substr($img ['file'], -strlen('.jpg')) !== '.jpg') &&
             (substr($img ['file'], -strlen('.jpeg')) !== '.jpeg')) {
             return false;
         }
 
         $geometry = $this->getCoordsFromExif($img ['id']);
-        if(!$geometry) {
+        if (!$geometry) {
             return false;
         }
         $geohash = $geometry->out('geohash');
@@ -222,9 +238,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * @return geoPHP\Geometry\Point|false
      * @throws Exception
      */
-    public function getCoordsFromExif(string $id) {
+    public function getCoordsFromExif(string $id)
+    {
         $exif = exif_read_data(mediaFN($id), 0, true);
-        if(empty ($exif ['GPS'])) {
+        if (empty ($exif ['GPS'])) {
             return false;
         }
 
@@ -255,8 +272,9 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * @param array $param array of rational DMS
      * @return float
      */
-    public function convertDMStoD(array $param): float {
-        if(!is_array($param)) {
+    public function convertDMStoD(array $param): float
+    {
+        if (!is_array($param)) {
             $param = array($param);
         }
         $deg = $this->convertRationaltoFloat($param [0]);
@@ -267,13 +285,14 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
         return $hem * ($deg + $min + $sec);
     }
 
-    public function convertRationaltoFloat($param): float {
+    public function convertRationaltoFloat($param): float
+    {
         // rational64u
         $nums = explode('/', $param);
-        if((int) $nums[1] > 0) {
-            return (float) $nums[0] / (int) $nums[1];
+        if ((int)$nums[1] > 0) {
+            return (float)$nums[0] / (int)$nums[1];
         } else {
-            return (float) $nums[0];
+            return (float)$nums[0];
         }
     }
 
@@ -282,22 +301,23 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      *
      * @param string $id document ID
      */
-    public function deleteFromIndex(string $id): void {
+    public function deleteFromIndex(string $id): void
+    {
         // check the index for document
         $knownHashes = $this->findHashesForId($id, $this->spatial_idx);
-        if(empty ($knownHashes)) {
+        if (empty ($knownHashes)) {
             return;
         }
 
         // TODO shortcut, need to make sure there is only one element, if not the index is corrupt
         $knownHash = $knownHashes [0];
-        $knownIds  = $this->spatial_idx [$knownHash];
-        $i         = array_search($id, $knownIds);
-        dbglog("removing: $knownIds[$i] from the index.");
+        $knownIds = $this->spatial_idx [$knownHash];
+        $i = array_search($id, $knownIds);
+        Logger::debug("removing: $knownIds[$i] from the index.");
         unset ($knownIds [$i]);
         $this->spatial_idx [$knownHash] = $knownIds;
-        if(empty ($this->spatial_idx [$knownHash])) {
-            // dbglog ( "removing key: $knownHash from the index." );
+        if (empty ($this->spatial_idx [$knownHash])) {
+            // Logger::debug ( "removing key: $knownHash from the index." );
             unset ($this->spatial_idx [$knownHash]);
         }
         $this->saveIndex();
