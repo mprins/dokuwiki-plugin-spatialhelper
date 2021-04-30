@@ -21,6 +21,6 @@
  * @author Mark C. Prins
  * @license BSD license
  */
-$meta ['media_kml'] = array('string');
-$meta ['media_georss'] = array('string');
-$meta ['sitemap_namespaces'] = array('');
+$meta['media_kml'] = array('string');
+$meta['media_georss'] = array('string');
+$meta['sitemap_namespaces'] = array('');
