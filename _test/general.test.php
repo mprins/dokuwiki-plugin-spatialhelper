@@ -21,16 +21,14 @@
  * @group plugin_spatialhelper
  * @group plugins
  */
-class general_plugin_spatialhelper_test extends DokuWikiTest
-{
+class general_plugin_spatialhelper_test extends DokuWikiTest {
 
     protected $pluginsEnabled = array('spatialhelper');
 
     /**
      * Simple test to make sure the plugin.info.txt is in correct format.
      */
-    public function test_plugininfo(): void
-    {
+    public function test_plugininfo(): void {
         $file = __DIR__ . '/../plugin.info.txt';
         self::assertFileExists($file);
 
@@ -54,8 +52,7 @@ class general_plugin_spatialhelper_test extends DokuWikiTest
     /**
      * test if plugin is loaded.
      */
-    public function test_plugin_spatialhelper_isloaded(): void
-    {
+    public function test_plugin_spatialhelper_isloaded(): void {
         global $plugin_controller;
         self::assertContains(
             'spatialhelper', $plugin_controller->getList(), "spatialhelper plugin is loaded"

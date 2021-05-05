@@ -11,8 +11,7 @@ use helper_plugin_spatialhelper_index;
  * @group plugin_spatialhelper
  * @group plugins
  */
-class index_test extends DokuWikiTest
-{
+class index_test extends DokuWikiTest {
 
     protected $pluginsEnabled = array('spatialhelper');
 
@@ -21,8 +20,7 @@ class index_test extends DokuWikiTest
      * @see index_test::test_convertDMStoD
      *
      */
-    public static function convertDMStoDTestdata(): array
-    {
+    public static function convertDMStoDTestdata(): array {
         return array(
             array(
                 array(0 => '52/1', 1 => '31/1', 2 => '2/1', 3 => 'N',),
@@ -50,8 +48,7 @@ class index_test extends DokuWikiTest
     /**
      * @dataProvider convertDMStoDTestdata
      */
-    public function test_convertDMStoD(array $input, float $expected_output, string $msg): void
-    {
+    public function test_convertDMStoD(array $input, float $expected_output, string $msg): void {
         $index = plugin_load('helper', 'spatialhelper_index');
         assert($index instanceof helper_plugin_spatialhelper_index);
 
