@@ -27,19 +27,13 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
      *
      * @see DokuWiki_Admin_Plugin::getMenuSort()
      */
-    public function getMenuSort() {
+    public function getMenuSort(): int {
         return 801;
     }
 
-    /**
-     * admin use only.
-     *
-     * @return true
-     *
-     * @see DokuWiki_Admin_Plugin::forAdminOnly()
-     */
-    public function forAdminOnly() {
-        return true;
+    public function getMenuIcon(): string {
+        $plugin = $this->getPluginName();
+        return DOKU_PLUGIN . $plugin . '/admin/purge.svg';
     }
 
     /**
@@ -47,15 +41,12 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
      *
      * @see DokuWiki_Admin_Plugin::handle()
      */
-    public function handle() {
-        global $conf;
+    public function handle(): void {
         if(isset ($_REQUEST ['purgeindex'])) {
             global $conf;
             $path = $conf ['indexdir'] . '/spatial.idx';
-            if(file_exists($path)) {
-                if(unlink($path)) {
-                    msg($this->getLang('admin_purged_tiles'), 0);
-                }
+            if(file_exists($path) && unlink($path)) {
+                msg($this->getLang('admin_purged_tiles'), 0);
             }
         }
 
@@ -72,7 +63,7 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
      *
      * @see DokuWiki_Admin_Plugin::html()
      */
-    public function html() {
+    public function html(): void {
         echo $this->locale_xhtml('admin_purge_intro');
 
         $form = new Doku_Form(
@@ -86,8 +77,8 @@ class admin_plugin_spatialhelper_purge extends DokuWiki_Admin_Plugin {
         $form->addElement(
             form_makeButton(
                 'submit', 'admin', $this->getLang('admin_submit'), array(
-                'title' => $this->getLang('admin_submit')
-            )
+                            'title' => $this->getLang('admin_submit')
+                        )
             )
         );
         $form->printForm();

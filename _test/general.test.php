@@ -30,23 +30,23 @@ class general_plugin_spatialhelper_test extends DokuWikiTest {
      */
     public function test_plugininfo(): void {
         $file = __DIR__ . '/../plugin.info.txt';
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $info = confToHash($file);
 
-        $this->assertArrayHasKey('base', $info);
-        $this->assertArrayHasKey('author', $info);
-        $this->assertArrayHasKey('email', $info);
-        $this->assertArrayHasKey('date', $info);
-        $this->assertArrayHasKey('name', $info);
-        $this->assertArrayHasKey('desc', $info);
-        $this->assertArrayHasKey('url', $info);
+        self::assertArrayHasKey('base', $info);
+        self::assertArrayHasKey('author', $info);
+        self::assertArrayHasKey('email', $info);
+        self::assertArrayHasKey('date', $info);
+        self::assertArrayHasKey('name', $info);
+        self::assertArrayHasKey('desc', $info);
+        self::assertArrayHasKey('url', $info);
 
-        $this->assertEquals('spatialhelper', $info['base']);
-        $this->assertRegExp('/^https?:\/\//', $info['url']);
-        $this->assertTrue(mail_isvalid($info['email']));
-        $this->assertRegExp('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
-        $this->assertTrue(false !== strtotime($info['date']));
+        self::assertEquals('spatialhelper', $info['base']);
+        self::assertRegExp('/^https?:\/\//', $info['url']);
+        self::assertTrue(mail_isvalid($info['email']));
+        self::assertRegExp('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
+        self::assertTrue(false !== strtotime($info['date']));
     }
 
     /**
@@ -54,7 +54,7 @@ class general_plugin_spatialhelper_test extends DokuWikiTest {
      */
     public function test_plugin_spatialhelper_isloaded(): void {
         global $plugin_controller;
-        $this->assertContains(
+        self::assertContains(
             'spatialhelper', $plugin_controller->getList(), "spatialhelper plugin is loaded"
         );
     }
