@@ -103,7 +103,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             return false;
         }
         dbglog($geotags, "Geo metadata found for page $id");
-        $geometry = new Point($geotags ['lon'], $geotags ['lat']);
+        $geometry = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
         $geohash  = $geometry->out('geohash');
         dbglog('Update index for geohash: ' . $geohash);
         return $this->addToIndex($geohash, $id);
@@ -219,7 +219,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * retrieve GPS decimal coordinates from exif.
      *
      * @param string $id
-     * @return Point|false
+     * @return geoPHP\Geometry\Point|false
      * @throws Exception
      */
     public function getCoordsFromExif(string $id) {
@@ -246,7 +246,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             )
         );
 
-        return new Point($lon, $lat);
+        return new geoPHP\Geometry\Point($lon, $lat);
     }
 
     /**
