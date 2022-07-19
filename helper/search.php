@@ -81,7 +81,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      *          The x coordinate (or longitude)
      */
     public function findNearbyLatLon(float $lat, float $lon): array {
-        $geometry = new Point($lon, $lat);
+        $geometry = new geoPHP\Geometry\Point($lon, $lat);
         return $this->findNearby($geometry->out('geohash'), $geometry);
     }
 
@@ -90,12 +90,12 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      * returns a list of documents and the bunding box.
      *
      * @param string $geohash
-     * @param Point  $p
+     * @param geoPHP\Geometry\Point  $p
      *          optional point
      * @return array of ...
      */
-    public function findNearby(string $geohash, Point $p = null): array {
-        $_geohashClass = new Geohash();
+    public function findNearby(string $geohash, geoPHP\Geometry\Point $p = null): array {
+        $_geohashClass = new geoPHP\Adapter\Geohash();
         if(!$p) {
             $decodedPoint = $_geohashClass->read($geohash);
         } else {
@@ -141,7 +141,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
                 $id = substr($id, strlen('media__'));
                 if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $point    = $indexer->getCoordsFromExif($id);
-                    $line     = new LineString(
+                    $line     = new geoPHP\Geometry\LineString(
                         [
                             $decodedPoint,
                             $point
@@ -158,8 +158,8 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
             } else {
                 if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $geotags  = p_get_metadata($id, 'geo');
-                    $point    = new Point($geotags ['lon'], $geotags ['lat']);
-                    $line     = new LineString(
+                    $point    = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
+                    $line     = new geoPHP\Geometry\LineString(
                         [
                             $decodedPoint,
                             $point
