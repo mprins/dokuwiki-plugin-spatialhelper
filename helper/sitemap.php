@@ -35,12 +35,14 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
         $idx_dir = $conf['indexdir'];
         if(!@file_exists($idx_dir . '/spatial.idx')) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
-            $indexer->generateSpatialIndex();
+            if($indexer !== null) {
+                $indexer->generateSpatialIndex();
+            }
         }
         $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
     }
 
-    public function getMethods(): array {
+    final public function getMethods(): array {
         $result[] = array(
             'name'   => 'createGeoRSSSitemap',
             'desc'   => 'create a spatial sitemap in GeoRSS format.',
@@ -70,7 +72,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
      * @param string $mediaID id
      *                        for the GeoRSS file
      */
-    public function createGeoRSSSitemap(string $mediaID): bool {
+    final public function createGeoRSSSitemap(string $mediaID): bool {
         global $conf;
         $namespace = getNS($mediaID);
 
@@ -96,7 +98,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
         io_createNamespace($mediaID, 'media');
         @touch(mediaFN($mediaID));
         @chmod(mediaFN($mediaID), $conf['fmode']);
-        $fh = fopen(mediaFN($mediaID), 'w');
+        $fh = fopen(mediaFN($mediaID), 'wb');
         fwrite($fh, $RSSstart);
 
         foreach($this->spatial_idx as $idxEntry) {
@@ -118,7 +120,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                     $entry .= '  <summary>' . $desc . '</summary>' . DOKU_LF;
                     $entry .= '  <georss:point>' . $meta['geo']['lat'] . ' ' . $meta['geo']['lon']
                         . '</georss:point>' . DOKU_LF;
-                    if($meta['geo']['alt']) {
+                    if(isset($meta['geo']['alt'])) {
                         $entry .= '  <georss:elev>' . $meta['geo']['alt'] . '</georss:elev>' . DOKU_LF;
                     }
                     $entry .= '  <link href="' . wl($id) . '" rel="alternate" type="text/html" />' . DOKU_LF;
@@ -167,7 +169,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
      *
      * @param string $mediaID id for the KML file
      */
-    public function createKMLSitemap(string $mediaID): bool {
+    final public function createKMLSitemap(string $mediaID): bool {
         global $conf;
         $namespace = getNS($mediaID);
 
@@ -191,7 +193,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
         @touch(mediaFN($mediaID));
         @chmod(mediaFN($mediaID), $conf['fmode']);
 
-        $fh = fopen(mediaFN($mediaID), 'w');
+        $fh = fopen(mediaFN($mediaID), 'wb');
         fwrite($fh, $KMLstart);
 
         foreach($this->spatial_idx as $idxEntry) {
@@ -224,7 +226,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                     $plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
 
                     $plcm .= '  <Point><coordinates>' . $meta['geo']['lon'] . ',' . $meta['geo']['lat'];
-                    if($meta['geo']['alt']) {
+                    if(isset($meta['geo']['alt'])) {
                         $plcm .= ',' . $meta['geo']['alt'];
                     }
                     $plcm .= '</coordinates></Point>' . DOKU_LF;
