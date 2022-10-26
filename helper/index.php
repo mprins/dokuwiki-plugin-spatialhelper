@@ -58,7 +58,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             // creates and stores the index
             $this->generateSpatialIndex();
         } else {
-            $this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false));
+            $this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false), false);
             dbglog($this->spatial_idx, 'done loading spatial index');
         }
     }
