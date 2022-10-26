@@ -39,7 +39,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                 $indexer->generateSpatialIndex();
             }
         }
-        $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false));
+        $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false), false);
     }
 
     final public function getMethods(): array {
