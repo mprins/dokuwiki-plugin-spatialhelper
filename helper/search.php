@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2014 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2022 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,6 +15,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+use geoPHP\Adapter\GeoHash;
+use geoPHP\Geometry\LineString;
+use geoPHP\Geometry\Point;
+
 /**
  * DokuWiki Plugin spatialhelper (Search component).
  *
@@ -28,10 +32,6 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      * @var array
      */
     protected $spatial_idx = array();
-    /**
-     * handle to the geoPHP plugin.
-     */
-    protected $geophp;
     /**
      * Precision, Distance of Adjacent Cell in Meters.
      *
@@ -59,17 +59,18 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         // parent::__construct ();
         global $conf;
 
-        if(!$geophp = plugin_load('helper', 'geophp')) {
-            $message = 'helper_plugin_spatialhelper_search::spatialhelper_search: geophp plugin is not available.';
+        if(!plugin_load('helper', 'geophp', false, true)) {
+            $message =
+                'helper_plugin_spatialhelper_search::spatialhelper_search: required geophp plugin is not available.';
             msg($message, -1);
         }
 
         $idx_dir = $conf ['indexdir'];
         if(!@file_exists($idx_dir . '/spatial.idx')) {
-            $indexer = plugin_load('helper', 'spatialhelper_index');
+            plugin_load('helper', 'spatialhelper_index');
         }
 
-        $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false), false);
+        $this->spatial_idx = unserialize(io_readFile($idx_dir . '/spatial.idx', false), ['allowed_classes' => false]);
     }
 
     /**
@@ -81,7 +82,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      *          The x coordinate (or longitude)
      */
     public function findNearbyLatLon(float $lat, float $lon): array {
-        $geometry = new geoPHP\Geometry\Point($lon, $lat);
+        $geometry = new Point($lon, $lat);
         return $this->findNearby($geometry->out('geohash'), $geometry);
     }
 
@@ -89,13 +90,14 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
      * finds nearby elements in the index based on the geohash.
      * returns a list of documents and the bunding box.
      *
-     * @param string $geohash
-     * @param geoPHP\Geometry\Point  $p
+     * @param string     $geohash
+     * @param Point|null $p
      *          optional point
      * @return array of ...
+     * @throws Exception
      */
-    public function findNearby(string $geohash, geoPHP\Geometry\Point $p = null): array {
-        $_geohashClass = new geoPHP\Adapter\Geohash();
+    public function findNearby(string $geohash, Point $p = null): array {
+        $_geohashClass = new Geohash();
         if(!$p) {
             $decodedPoint = $_geohashClass->read($geohash);
         } else {
@@ -105,14 +107,14 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
         // find adjacent blocks
         $adjacent                 = array();
         $adjacent ['center']      = $geohash;
-        $adjacent ['top']         = $_geohashClass->adjacent($adjacent ['center'], 'top');
-        $adjacent ['bottom']      = $_geohashClass->adjacent($adjacent ['center'], 'bottom');
-        $adjacent ['right']       = $_geohashClass->adjacent($adjacent ['center'], 'right');
-        $adjacent ['left']        = $_geohashClass->adjacent($adjacent ['center'], 'left');
-        $adjacent ['topleft']     = $_geohashClass->adjacent($adjacent ['left'], 'top');
-        $adjacent ['topright']    = $_geohashClass->adjacent($adjacent ['right'], 'top');
-        $adjacent ['bottomright'] = $_geohashClass->adjacent($adjacent ['right'], 'bottom');
-        $adjacent ['bottomleft']  = $_geohashClass->adjacent($adjacent ['left'], 'bottom');
+        $adjacent ['top']         = Geohash::adjacent($adjacent ['center'], 'top');
+        $adjacent ['bottom']      = Geohash::adjacent($adjacent ['center'], 'bottom');
+        $adjacent ['right']       = Geohash::adjacent($adjacent ['center'], 'right');
+        $adjacent ['left']        = Geohash::adjacent($adjacent ['center'], 'left');
+        $adjacent ['topleft']     = Geohash::adjacent($adjacent ['left'], 'top');
+        $adjacent ['topright']    = Geohash::adjacent($adjacent ['right'], 'top');
+        $adjacent ['bottomright'] = Geohash::adjacent($adjacent ['right'], 'bottom');
+        $adjacent ['bottomleft']  = Geohash::adjacent($adjacent ['left'], 'bottom');
         dbglog($adjacent, "adjacent geo hashes:");
 
         // find all the pages in the index that overlap with the adjacent hashes
@@ -141,7 +143,7 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
                 $id = substr($id, strlen('media__'));
                 if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $point    = $indexer->getCoordsFromExif($id);
-                    $line     = new geoPHP\Geometry\LineString(
+                    $line     = new LineString(
                         [
                             $decodedPoint,
                             $point
@@ -158,8 +160,8 @@ class helper_plugin_spatialhelper_search extends DokuWiki_Plugin {
             } else {
                 if(auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $geotags  = p_get_metadata($id, 'geo');
-                    $point    = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
-                    $line     = new geoPHP\Geometry\LineString(
+                    $point    = new Point($geotags ['lon'], $geotags ['lat']);
+                    $line     = new LineString(
                         [
                             $decodedPoint,
                             $point

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2014-2016 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2022 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -39,7 +39,10 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                 $indexer->generateSpatialIndex();
             }
         }
-        $this->spatial_idx = unserialize(io_readFile($fn = $idx_dir . '/spatial.idx', false), false);
+        $this->spatial_idx = unserialize(
+            io_readFile($fn = $idx_dir . '/spatial.idx', false),
+            ['allowed_classes' => false]
+        );
     }
 
     final public function getMethods(): array {
