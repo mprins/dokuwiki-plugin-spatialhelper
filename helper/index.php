@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2011-2017 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2022 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,6 +14,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
+use geoPHP\Geometry\Point;
 
 /**
  * DokuWiki Plugin spatialhelper (index component).
@@ -38,17 +40,12 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
     protected $spatial_idx = array();
 
     /**
-     * handle to the geoPHP plugin.
-     */
-    protected $geophp;
-
-    /**
      * Constructor, initialises the spatial index.
      */
     public function __construct() {
-        if(!$geophp = plugin_load('helper', 'geophp')) {
-            $message = 'helper_plugin_spatialhelper_index::spatialhelper_index: geophp plugin is not available.';
-            msg($message, -1);
+        if(!plugin_load('helper', 'geophp')) {
+          $message = 'helper_plugin_spatialhelper_index::spatialhelper_index: required geophp plugin is not available.';
+          msg($message, -1);
         }
 
         global $conf;
@@ -58,7 +55,10 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             // creates and stores the index
             $this->generateSpatialIndex();
         } else {
-            $this->spatial_idx = unserialize(io_readFile($this->idx_dir . '/spatial.idx', false), false);
+            $this->spatial_idx = unserialize(
+                io_readFile($this->idx_dir . '/spatial.idx', false),
+                ['allowed_classes' => false]
+            );
             dbglog($this->spatial_idx, 'done loading spatial index');
         }
     }
@@ -103,7 +103,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             return false;
         }
         dbglog($geotags, "Geo metadata found for page $id");
-        $geometry = new geoPHP\Geometry\Point($geotags ['lon'], $geotags ['lat']);
+        $geometry = new Point($geotags ['lon'], $geotags ['lat']);
         $geohash  = $geometry->out('geohash');
         dbglog('Update index for geohash: ' . $geohash);
         return $this->addToIndex($geohash, $id);
@@ -219,7 +219,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
      * retrieve GPS decimal coordinates from exif.
      *
      * @param string $id
-     * @return geoPHP\Geometry\Point|false
+     * @return Point|false
      * @throws Exception
      */
     public function getCoordsFromExif(string $id) {
@@ -246,7 +246,7 @@ class helper_plugin_spatialhelper_index extends DokuWiki_Plugin {
             )
         );
 
-        return new geoPHP\Geometry\Point($lon, $lat);
+        return new Point($lon, $lat);
     }
 
     /**
