@@ -123,7 +123,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                     $entry .= '  <summary>' . $desc . '</summary>' . DOKU_LF;
                     $entry .= '  <georss:point>' . $meta['geo']['lat'] . ' ' . $meta['geo']['lon']
                         . '</georss:point>' . DOKU_LF;
-                    if(isset($meta['geo']['alt'])) {
+                    if(!empty($meta['geo']['alt'])) {
                         $entry .= '  <georss:elev>' . $meta['geo']['alt'] . '</georss:elev>' . DOKU_LF;
                     }
                     $entry .= '  <link href="' . wl($id) . '" rel="alternate" type="text/html" />' . DOKU_LF;
@@ -229,7 +229,7 @@ class helper_plugin_spatialhelper_sitemap extends DokuWiki_Plugin {
                     $plcm .= '  <styleUrl>#icon</styleUrl>' . DOKU_LF;
 
                     $plcm .= '  <Point><coordinates>' . $meta['geo']['lon'] . ',' . $meta['geo']['lat'];
-                    if(isset($meta['geo']['alt'])) {
+                    if(!empty($meta['geo']['alt'])) {
                         $plcm .= ',' . $meta['geo']['alt'];
                     }
                     $plcm .= '</coordinates></Point>' . DOKU_LF;
