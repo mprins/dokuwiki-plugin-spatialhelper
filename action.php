@@ -62,6 +62,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
         $controller->register_hook('MEDIA_DELETE_FILE', 'BEFORE', $this, 'handleMediaDeleted', array());
 
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'handleMetaheaderOutput');
+        $controller->register_hook('PLUGIN_POPULARITY_DATA_SETUP', 'AFTER', $this, 'popularity');
     }
 
     /**
@@ -386,6 +387,20 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
             "href"  => ml($this->getConf('media_kml')),
             "title" => "KML Sitemap"
         );
+    }
+
+    /**
+     * Add spatialhelper popularity data.
+     *
+     * @param Doku_Event $event
+     *          the DokuWiki event
+     */
+    final public function popularity(Doku_Event $event): void {
+        global $updateVersion;
+        $plugin_info                                     = $this->getInfo();
+        $event->data['spatialhelper']['version']         = $plugin_info['date'];
+        $event->data['spatialhelper']['dwversion']       = $updateVersion;
+        $event->data['spatialhelper']['combinedversion'] = $updateVersion . '_' . $plugin_info['date'];
     }
 
     /**
