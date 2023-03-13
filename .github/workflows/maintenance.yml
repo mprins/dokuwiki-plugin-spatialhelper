@@ -2,7 +2,7 @@ name: 'Repository Maintenance'
 
 on:
   schedule:
-    - cron: '23 3 * * 6'
+    - cron: '23 3 * * 4'
 
 jobs:
   lock:
