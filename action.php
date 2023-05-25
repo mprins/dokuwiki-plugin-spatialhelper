@@ -338,7 +338,7 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
         if(substr_compare($event->data [3], 'image/jpeg', 0)) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
             if($indexer) {
-                $indexer->indexImage($event->data [2], $event->data [1]);
+                $indexer->indexImage($event->data [2]);
             }
         }
         // TODO add image/tiff
