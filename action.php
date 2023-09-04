@@ -396,11 +396,11 @@ class action_plugin_spatialhelper extends DokuWiki_Action_Plugin {
      *          the DokuWiki event
      */
     final public function popularity(Doku_Event $event): void {
-        global $updateVersion;
+        $versionInfo                                     = getVersionData();
         $plugin_info                                     = $this->getInfo();
         $event->data['spatialhelper']['version']         = $plugin_info['date'];
-        $event->data['spatialhelper']['dwversion']       = $updateVersion;
-        $event->data['spatialhelper']['combinedversion'] = $updateVersion . '_' . $plugin_info['date'];
+        $event->data['spatialhelper']['dwversion']       = $versionInfo['date'];
+        $event->data['spatialhelper']['combinedversion'] = $versionInfo['date'] . '_' . $plugin_info['date'];
     }
 
     /**
