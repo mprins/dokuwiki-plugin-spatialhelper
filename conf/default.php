@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2011-2017 Mark C. Prins <mprins@users.sf.net>
  *
@@ -21,6 +22,7 @@
  * @author Mark C. Prins
  * @license BSD license
  */
+
 $conf['media_kml'] = ':sitemap.kml';
 $conf['media_georss'] = ':sitemap.georss';
 $conf['sitemap_namespaces'] = '';

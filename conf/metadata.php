@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2011-2017 Mark C. Prins <mprins@users.sf.net>
  *
@@ -21,6 +22,7 @@
  * @author Mark C. Prins
  * @license BSD license
  */
+
 $meta ['media_kml'] = array('string');
 $meta ['media_georss'] = array('string');
 $meta ['sitemap_namespaces'] = array('');
