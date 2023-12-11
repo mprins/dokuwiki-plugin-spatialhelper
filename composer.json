@@ -1,0 +1,25 @@
+{
+  "name": "mprins/dokuwiki-plugin-spatialhelper",
+  "description": "Provides spatial indexing and spatial search facilities.",
+  "homepage": " https://www.dokuwiki.org/plugin:spatialhelper",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "type": "plugin",
+  "authors": [
+    {
+      "name": "Mark C. Prins",
+      "email": "mprins@users.sf.net"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "config": {
+    "platform": {
+      "php": "8.0"
+    }
+  },
+  "suggest": {
+    "mprins/dokuwiki-plugin-geotag": ">=2023-07-14"
+  }
+}
