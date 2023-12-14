@@ -12,7 +12,9 @@
     }
   ],
   "require": {
-    "php": ">=7.4"
+    "php": ">=8.0",
+    "ext-exif": "*",
+    "mprins/dokuwiki-plugin-geophp": ">=2023-07-14"
   },
   "config": {
     "platform": {
