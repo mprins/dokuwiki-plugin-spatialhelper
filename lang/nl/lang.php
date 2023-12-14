@@ -33,7 +33,7 @@ $lang ['results_media']           = 'Media in de buurt';
 $lang ['results_distance_prefix'] = 'Afstand hemelsbreed:&nbsp;';
 $lang ['results_precision']       = 'Nauwkeurigheid:&nbsp;';
 
-$lang ['admin_submit']       = 'Ruimtelijke index wissen.';
+$lang ['admin_submit']       = 'Ruimtelijke index wissen';
 $lang ['admin_purged_tiles'] = 'Ruimtelijke index gewist';
 
 $lang ['menu'] = 'Ruimtelijke index en sitemap manager';

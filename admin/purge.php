@@ -1,6 +1,7 @@
 <?php
 
 use dokuwiki\Extension\AdminPlugin;
+use dokuwiki\Form\Form;
 
 /*
  * Copyright (c) 2014 Mark C. Prins <mprins@users.sf.net>
@@ -17,6 +18,7 @@ use dokuwiki\Extension\AdminPlugin;
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /**
  * DokuWiki Plugin spatialhelper (Admin Component).
  * This component purges and recreates the spatial index and sitemaps.
@@ -29,12 +31,12 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::getMenuSort()
      */
-    public function getMenuSort(): int
+    final  public function getMenuSort(): int
     {
         return 801;
     }
 
-    public function getMenuIcon(): string
+    final  public function getMenuIcon(): string
     {
         $plugin = $this->getPluginName();
         return DOKU_PLUGIN . $plugin . '/admin/purge.svg';
@@ -45,7 +47,7 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::handle()
      */
-    public function handle(): void
+    final  public function handle(): void
     {
         if (isset($_REQUEST ['purgeindex'])) {
             global $conf;
@@ -56,11 +58,15 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
         }
 
         $indexer = plugin_load('helper', 'spatialhelper_index');
-        $indexer->generateSpatialIndex();
+        if (isset($indexer)) {
+            $indexer->generateSpatialIndex();
+        }
 
         $sitemapper = plugin_load('helper', 'spatialhelper_sitemap');
-        $sitemapper->createKMLSitemap($this->getConf('media_kml'));
-        $sitemapper->createGeoRSSSitemap($this->getConf('media_georss'));
+        if (isset($sitemapper)) {
+            $sitemapper->createKMLSitemap($this->getConf('media_kml'));
+            $sitemapper->createGeoRSSSitemap($this->getConf('media_georss'));
+        }
     }
 
     /**
@@ -68,23 +74,16 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::html()
      */
-    public function html(): void
+    final  public function html(): void
     {
         echo $this->locale_xhtml('admin_purge_intro');
 
-        $form = new Doku_Form(
-            ['id'     => 'spatialhelper__purgeform', 'method' => 'post']
+        $form = new Form(
+            ['id' => 'spatialhelper__purgeform', 'method' => 'post']
         );
-        $form->addHidden('purgeindex', 'true');
-
-        $form->addElement(
-            form_makeButton(
-                'submit',
-                'admin',
-                $this->getLang('admin_submit'),
-                ['title' => $this->getLang('admin_submit')]
-            )
-        );
-        $form->printForm();
+        $form->setHiddenField('purgeindex', 'true');
+        $form->addButton('submit', $this->getLang('admin_submit'))
+            ->attr('title', $this->getLang('admin_submit'));
+        echo $form->toHTML();
     }
 }
