@@ -50,7 +50,7 @@ class helper_plugin_spatialhelper_index extends Plugin
     public function __construct()
     {
         if (plugin_load('helper', 'geophp') === null) {
-            $message = 'helper_plugin_spatialhelper_index::spatialhelper_index: required geophp plugin is not available.';
+            $message = 'Required geophp plugin is not available';
             msg($message, -1);
         }
 
@@ -236,7 +236,7 @@ class helper_plugin_spatialhelper_index extends Plugin
      * @return Point|false
      * @throws Exception
      */
-    final  public function getCoordsFromExif(string $id): Point|false
+    final public function getCoordsFromExif(string $id): Point|false
     {
         $exif = exif_read_data(mediaFN($id), 0, true);
         if (empty($exif ['GPS'])) {
@@ -244,11 +244,21 @@ class helper_plugin_spatialhelper_index extends Plugin
         }
 
         $lat = $this->convertDMStoD(
-            [$exif ['GPS'] ['GPSLatitude'] [0], $exif ['GPS'] ['GPSLatitude'] [1], $exif ['GPS'] ['GPSLatitude'] [2], $exif ['GPS'] ['GPSLatitudeRef']]
+            [
+                $exif ['GPS'] ['GPSLatitude'] [0],
+                $exif ['GPS'] ['GPSLatitude'] [1],
+                $exif ['GPS'] ['GPSLatitude'] [2],
+                $exif ['GPS'] ['GPSLatitudeRef']
+            ]
         );
 
         $lon = $this->convertDMStoD(
-            [$exif ['GPS'] ['GPSLongitude'] [0], $exif ['GPS'] ['GPSLongitude'] [1], $exif ['GPS'] ['GPSLongitude'] [2], $exif ['GPS'] ['GPSLongitudeRef']]
+            [
+                $exif ['GPS'] ['GPSLongitude'] [0],
+                $exif ['GPS'] ['GPSLongitude'] [1],
+                $exif ['GPS'] ['GPSLongitude'] [2],
+                $exif ['GPS'] ['GPSLongitudeRef']
+            ]
         );
 
         return new Point($lon, $lat);
