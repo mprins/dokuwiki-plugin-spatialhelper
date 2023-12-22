@@ -261,9 +261,9 @@ class helper_plugin_spatialhelper_index extends Plugin
      */
     final  public function convertDMStoD(array $param): float
     {
-    //        if (!(is_array($param))) {
-    //            $param = [$param];
-    //        }
+        //        if (!(is_array($param))) {
+        //            $param = [$param];
+        //        }
         $deg = $this->convertRationaltoFloat($param [0]);
         $min = $this->convertRationaltoFloat($param [1]) / 60;
         $sec = $this->convertRationaltoFloat($param [2]) / 60 / 60;

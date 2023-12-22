@@ -4,7 +4,7 @@ use dokuwiki\Extension\AdminPlugin;
 use dokuwiki\Form\Form;
 
 /*
- * Copyright (c) 2014 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2023 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

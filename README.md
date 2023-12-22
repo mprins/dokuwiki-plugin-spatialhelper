@@ -4,7 +4,8 @@ Provides spatial indexing and spatial search facilities.
 
 All documentation for this plugin can be found at http://www.dokuwiki.org/plugin:spatialhelper
 
-If you install this plugin manually, make sure it is installed in lib/plugins/spatialhelper/ - if the folder is called different it will not work!
+If you install this plugin manually, make sure it is installed in lib/plugins/spatialhelper/ - if the folder is called
+different it will not work!
 
 Please refer to http://www.dokuwiki.org/plugins for additional info on how to install plugins in DokuWiki.
 

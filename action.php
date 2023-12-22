@@ -266,18 +266,18 @@ class action_plugin_spatialhelper extends ActionPlugin
             $pagelist = '<ol>' . DOKU_LF;
             foreach ($pages as $page) {
                 $pagelist .= '<li>' . html_wikilink(
-                    ':' . $page ['id'],
-                    useHeading('navigation') ? null :
+                        ':' . $page ['id'],
+                        useHeading('navigation') ? null :
                             noNS($page ['id'])
-                ) . ' (' . $this->getLang('results_distance_prefix')
+                    ) . ' (' . $this->getLang('results_distance_prefix')
                     . $page ['distance'] . '&nbsp;m) ' . $page ['description'] . '</li>' . DOKU_LF;
             }
             $pagelist .= '</ol>' . DOKU_LF;
 
             echo '<h2>' . $this->getLang('results_pages') . hsc(
-                ' lat;lon: ' . $lat . ';' . $lon
+                    ' lat;lon: ' . $lat . ';' . $lon
                     . ' (geohash: ' . $geohash . ')'
-            ) . '</h2>';
+                ) . '</h2>';
             echo '<div class="level2">' . DOKU_LF;
             echo $pagelist;
             echo '</div>' . DOKU_LF;
@@ -299,9 +299,9 @@ class action_plugin_spatialhelper extends ActionPlugin
             $pagelist .= '</ol>' . DOKU_LF;
 
             echo '<h2>' . $this->getLang('results_media') . hsc(
-                ' lat;lon: ' . $lat . ';' . $lon
+                    ' lat;lon: ' . $lat . ';' . $lon
                     . ' (geohash: ' . $geohash . ')'
-            ) . '</h2>' . DOKU_LF;
+                ) . '</h2>' . DOKU_LF;
             echo '<div class="level2">' . DOKU_LF;
             echo $pagelist;
             echo '</div>' . DOKU_LF;
