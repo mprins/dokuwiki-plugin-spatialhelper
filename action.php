@@ -33,7 +33,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Register for events.
      *
-     * @param Doku_Event_Handler $controller
+     * @param EventHandler $controller
      *          DokuWiki's event controller object.
      */
     final public function register(EventHandler $controller): void
@@ -78,7 +78,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Update the spatial index for the page.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          event object
      */
     final  public function handleIndexerPageAdd(Event $event): void
@@ -96,7 +96,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Update the spatial index, removing the page.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          event object
      */
     final    public function removeFromIndex(Event $event): void
@@ -131,7 +131,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Add a new SitemapItem object that points to the KML of public geocoded pages.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      */
     final   public function handleSitemapGenerateBefore(Event $event): void
     {
@@ -143,7 +143,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Create a spatial sitemap or attach the geo/kml map to the sitemap.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          event object, not used
      */
     final   public function handleSitemapGenerateAfter(Event $event): bool
@@ -175,7 +175,7 @@ class action_plugin_spatialhelper extends ActionPlugin
      * trap findnearby action.
      * This additional handler is required as described at: https://www.dokuwiki.org/devel:event:tpl_act_unknown
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          event object
      */
     final  public function handleActionActPreprocess(Event $event): void
@@ -189,7 +189,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * handle findnearby action.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          event object
      * @param array $param
      *          associative array with keys
@@ -266,18 +266,18 @@ class action_plugin_spatialhelper extends ActionPlugin
             $pagelist = '<ol>' . DOKU_LF;
             foreach ($pages as $page) {
                 $pagelist .= '<li>' . html_wikilink(
-                        ':' . $page ['id'],
-                        useHeading('navigation') ? null :
+                    ':' . $page ['id'],
+                    useHeading('navigation') ? null :
                             noNS($page ['id'])
-                    ) . ' (' . $this->getLang('results_distance_prefix')
+                ) . ' (' . $this->getLang('results_distance_prefix')
                     . $page ['distance'] . '&nbsp;m) ' . $page ['description'] . '</li>' . DOKU_LF;
             }
             $pagelist .= '</ol>' . DOKU_LF;
 
             echo '<h2>' . $this->getLang('results_pages') . hsc(
-                    ' lat;lon: ' . $lat . ';' . $lon
+                ' lat;lon: ' . $lat . ';' . $lon
                     . ' (geohash: ' . $geohash . ')'
-                ) . '</h2>';
+            ) . '</h2>';
             echo '<div class="level2">' . DOKU_LF;
             echo $pagelist;
             echo '</div>' . DOKU_LF;
@@ -299,9 +299,9 @@ class action_plugin_spatialhelper extends ActionPlugin
             $pagelist .= '</ol>' . DOKU_LF;
 
             echo '<h2>' . $this->getLang('results_media') . hsc(
-                    ' lat;lon: ' . $lat . ';' . $lon
+                ' lat;lon: ' . $lat . ';' . $lon
                     . ' (geohash: ' . $geohash . ')'
-                ) . '</h2>' . DOKU_LF;
+            ) . '</h2>' . DOKU_LF;
             echo '<div class="level2">' . DOKU_LF;
             echo $pagelist;
             echo '</div>' . DOKU_LF;
@@ -321,7 +321,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * add media to spatial index.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      */
     final  public function handleMediaUploaded(Event $event): void
     {
@@ -348,7 +348,7 @@ class action_plugin_spatialhelper extends ActionPlugin
 
     /**
      * removes the media from the index.
-     * @param Doku_Event $event event object with data
+     * @param Event $event event object with data
      */
     final   public function handleMediaDeleted(Event $event): void
     {
@@ -367,7 +367,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * add a link to the spatial sitemap files in the header.
      *
-     * @param Doku_Event $event the DokuWiki event. $event->data is a two-dimensional array of all meta headers.
+     * @param Event $event the DokuWiki event. $event->data is a two-dimensional array of all meta headers.
      * The keys are meta, link and script.
      *
      * @see http://www.dokuwiki.org/devel:event:tpl_metaheader_output
@@ -384,7 +384,7 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Add spatialhelper popularity data.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      *          the DokuWiki event
      */
     final public function popularity(Event $event): void
