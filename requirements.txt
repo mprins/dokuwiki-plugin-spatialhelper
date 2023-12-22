@@ -1,0 +1,1 @@
+https://github.com/mprins/dokuwiki-plugin-geophp.git lib/plugins/geophp

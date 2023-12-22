@@ -27,13 +27,13 @@ $lang ['invalidinput'] = 'Введены некорректные данные.'
 $lang ['search_findnearby'] = 'Искать страницы и медиаданные около точки';
 $lang ['search_largerarea'] = 'Расширить область поиска';
 
-$lang ['results_header']          = 'Результаты поиска';
-$lang ['results_pages']           = 'Страницы около точки';
-$lang ['results_media']           = 'Медиаданные около точки';
+$lang ['results_header'] = 'Результаты поиска';
+$lang ['results_pages'] = 'Страницы около точки';
+$lang ['results_media'] = 'Медиаданные около точки';
 $lang ['results_distance_prefix'] = 'расстояние по прямой:&nbsp;';
-$lang ['results_precision']       = 'Погрешность:&nbsp;';
+$lang ['results_precision'] = 'Погрешность:&nbsp;';
 
-$lang ['admin_submit']       = 'Очистить пространственный индекс';
+$lang ['admin_submit'] = 'Очистить пространственный индекс';
 $lang ['admin_purged_tiles'] = 'Пространственный индекс был очищен.';
 
 $lang ['menu'] = 'Очистка пространственного индекса';

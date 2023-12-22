@@ -21,14 +21,16 @@
  * @group plugin_spatialhelper
  * @group plugins
  */
-class general_plugin_spatialhelper_test extends DokuWikiTest {
+class general_plugin_spatialhelper_test extends DokuWikiTest
+{
 
     protected $pluginsEnabled = array('spatialhelper');
 
     /**
      * Simple test to make sure the plugin.info.txt is in correct format.
      */
-    public function test_plugininfo(): void {
+    final  public function test_plugininfo(): void
+    {
         $file = __DIR__ . '/../plugin.info.txt';
         self::assertFileExists($file);
 
@@ -46,13 +48,14 @@ class general_plugin_spatialhelper_test extends DokuWikiTest {
         self::assertRegExp('/^https?:\/\//', $info['url']);
         self::assertTrue(mail_isvalid($info['email']));
         self::assertRegExp('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
-        self::assertTrue(false !== strtotime($info['date']));
+        self::assertNotFalse(strtotime($info['date']));
     }
 
     /**
      * test if plugin is loaded.
      */
-    public function test_plugin_spatialhelper_isloaded(): void {
+    final  public function test_plugin_spatialhelper_isloaded(): void
+    {
         global $plugin_controller;
         self::assertContains(
             'spatialhelper', $plugin_controller->getList(), "spatialhelper plugin is loaded"

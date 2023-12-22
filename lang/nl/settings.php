@@ -20,6 +20,6 @@
  *
  * @author Mark C. Prins
  */
-$lang ['media_kml']          = '(namespaced) naam van de KML sitemap van deze wiki. (:sitemap.kml)';
-$lang ['media_georss']       = '(namespaced) naam van de GeoRSS sitemap van deze wiki. (:sitemap.georss)';
+$lang ['media_kml'] = '(namespaced) naam van de KML sitemap van deze wiki. (:sitemap.kml)';
+$lang ['media_georss'] = '(namespaced) naam van de GeoRSS sitemap van deze wiki. (:sitemap.georss)';
 $lang ['sitemap_namespaces'] = 'extra namespaces om KML / GeoRSS sitemaps te genereren (1 namespace per regel)';

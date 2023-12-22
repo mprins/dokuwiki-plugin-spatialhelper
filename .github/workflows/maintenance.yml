@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '23 3 * * 4'
-    
+
 jobs:
   action:
     name: 'Repository Maintenance'
     uses: mprins/.github/.github/workflows/maintenance.yml@main
     with:
-        issue-inactive-days: '63'
-        pr-inactive-days: '22'
+      issue-inactive-days: '63'
+      pr-inactive-days: '22'

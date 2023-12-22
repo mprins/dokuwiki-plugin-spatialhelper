@@ -1,9 +1,10 @@
 <?php
 
 use dokuwiki\Extension\Plugin;
+use dokuwiki\Logger;
 
 /*
- * Copyright (c) 2014-2022 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2023 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,6 +18,7 @@ use dokuwiki\Extension\Plugin;
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /**
  * DokuWiki Plugin spatialhelper (sitemap Component).
  *
@@ -44,15 +46,23 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
             }
         }
         $this->spatial_idx = unserialize(
-            io_readFile($fn = $idx_dir . '/spatial.idx', false),
+            io_readFile($idx_dir . '/spatial.idx', false),
             ['allowed_classes' => false]
         );
     }
 
     final public function getMethods(): array
     {
-        $result[] = ['name'   => 'createGeoRSSSitemap', 'desc'   => 'create a spatial sitemap in GeoRSS format.', 'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']];
-        $result[] = ['name'   => 'createKMLSitemap', 'desc'   => 'create a spatial sitemap in KML format.', 'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']];
+        $result[] = [
+            'name' => 'createGeoRSSSitemap',
+            'desc' => 'create a spatial sitemap in GeoRSS format.',
+            'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']
+        ];
+        $result[] = [
+            'name' => 'createKMLSitemap',
+            'desc' => 'create a spatial sitemap in KML format.',
+            'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']
+        ];
         return $result;
     }
 
@@ -96,7 +106,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
             // get list of id's
             foreach ($idxEntry as $id) {
                 // for document item in the index
-                if (strpos($id, 'media__', 0) !== 0) {
+                if (strpos($id, 'media__') !== 0) {
                     if ($this->skipPage($id, $namespace)) {
                         continue;
                     }
@@ -138,7 +148,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
      */
     private function skipPage(string $id, string $namespace): bool
     {
-        dbglog("helper_plugin_spatialhelper_sitemap::skipPage, check for $id in $namespace");
+        Logger::debug("helper_plugin_spatialhelper_sitemap::skipPage, skipping $id, not in $namespace");
         if (isHiddenPage($id)) {
             return true;
         }
@@ -149,7 +159,6 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
         if (!empty($namespace)) {
             // only if id is in or below namespace
             if (0 !== strpos(getNS($id), $namespace)) {
-                // dbglog("helper_plugin_spatialhelper_sitemap::skipPage, skipping $id, not in $namespace");
                 return true;
             }
         }
@@ -193,7 +202,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
             // get list of id's
             foreach ($idxEntry as $id) {
                 // for document item in the index
-                if (strpos($id, 'media__', 0) !== 0) {
+                if (strpos($id, 'media__') !== 0) {
                     if ($this->skipPage($id, $namespace)) {
                         continue;
                     }
