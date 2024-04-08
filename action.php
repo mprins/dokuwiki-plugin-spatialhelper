@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011-2020 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2024 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -325,18 +325,18 @@ class action_plugin_spatialhelper extends ActionPlugin
      */
     final  public function handleMediaUploaded(Event $event): void
     {
-        // data[0] temporary file name (read from $_FILES)
-        // data[1] file name of the file being uploaded
-        // data[2] future directory id of the file being uploaded
-        // data[3] the mime type of the file being uploaded
-        // data[4] true if the uploaded file exists already
-        // data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
+        //data[0] path/to/new/media.file (normally read from $_FILES, potentially could come from elsewhere)
+        //data[1] file name of the file being uploaded
+        //data[2] future directory id of the file being uploaded
+        //data[3] the mime type of the file being uploaded
+        //data[4] true if the uploaded file exists already
+        //data[5] (since 2011-02-06) the PHP function used to move the file to the correct location
 
         Logger::debug("handleMediaUploaded::event data", $event->data);
 
         // check the list of mimetypes
         // if it's a supported type call appropriate index function
-        if (substr_compare($event->data [3], 'image/jpeg', 0)) {
+        if (str_contains($event->data [3], 'image/jpeg')) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
             if ($indexer !== null) {
                 $indexer->indexImage($event->data [2]);

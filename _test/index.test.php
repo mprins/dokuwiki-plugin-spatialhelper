@@ -21,7 +21,7 @@ class index_test extends DokuWikiTest
      * @see index_test::test_convertDMStoD
      *
      */
-    final  public static function convertDMStoDTestdata(): array
+    final public static function convertDMStoDTestdata(): array
     {
         return array(
             array(
@@ -50,7 +50,7 @@ class index_test extends DokuWikiTest
     /**
      * @dataProvider convertDMStoDTestdata
      */
-    final  public function test_convertDMStoD(array $input, float $expected_output, string $msg): void
+    final public function test_convertDMStoD(array $input, float $expected_output, string $msg): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');
         assert($index instanceof helper_plugin_spatialhelper_index);
