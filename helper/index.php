@@ -211,10 +211,11 @@ class helper_plugin_spatialhelper_index extends Plugin
     final public function indexImage(string $imgId): bool
     {
         // test for supported files (jpeg only)
-        if ((!str_ends_with(strtolower($imgId), '.jpg')) &&
+        if (
+            (!str_ends_with(strtolower($imgId), '.jpg')) &&
             (!str_ends_with(strtolower($imgId), '.jpeg'))
         ) {
-            Logger::debug("indexImage:: ".$imgId." is not a supported image file.");
+            Logger::debug("indexImage:: " . $imgId . " is not a supported image file.");
             return false;
         }
 
