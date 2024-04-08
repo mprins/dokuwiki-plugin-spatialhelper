@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011-2023 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2024 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -86,10 +86,10 @@ class helper_plugin_spatialhelper_index extends Plugin
         }
         // media
         $media = [];
-        search($media, $conf ['mediadir'], 'search_media', []);
+        search($media, $conf['mediadir'], 'search_media', []);
         foreach ($media as $medium) {
-            if ($medium ['isimg']) {
-                $this->indexImage($medium);
+            if ($medium['isimg']) {
+                $this->indexImage($medium['id']);
             }
         }
         return true;
@@ -200,33 +200,33 @@ class helper_plugin_spatialhelper_index extends Plugin
     /**
      * Add an index entry for this file having EXIF / IPTC data.
      *
-     * @param $img
-     *          a Dokuwiki image
-     * @return bool true when image was succesfully added to the index.
+     * @param $imgId
+     *          a Dokuwiki image id
+     * @return bool true when image was successfully added to the index.
      * @throws Exception
      * @see http://www.php.net/manual/en/function.iptcparse.php
      * @see http://php.net/manual/en/function.exif-read-data.php
      *
      */
-    final  public function indexImage(array $img): bool
+    final public function indexImage(string $imgId): bool
     {
         // test for supported files (jpeg only)
-        if (
-            (!str_ends_with($img ['file'], '.jpg')) &&
-            (!str_ends_with($img ['file'], '.jpeg'))
+        if ((!str_ends_with(strtolower($imgId), '.jpg')) &&
+            (!str_ends_with(strtolower($imgId), '.jpeg'))
         ) {
+            Logger::debug("indexImage:: ".$imgId." is not a supported image file.");
             return false;
         }
 
-        $geometry = $this->getCoordsFromExif($img ['id']);
+        $geometry = $this->getCoordsFromExif($imgId);
         if (!$geometry) {
             return false;
         }
         $geohash = $geometry->out('geohash');
         // TODO truncate the geohash to something reasonable, otherwise they are
-        // useless as an indexing mechanism eg. u1h73weckdrmskdqec3c9 is far too
-        // precise, limit at ~9 as most GPS are not submeter accurate
-        return $this->addToIndex($geohash, 'media__' . $img ['id']);
+        //   useless as an indexing mechanism eg. u1h73weckdrmskdqec3c9 is far too
+        //   precise, limit at ~9 as most GPS are not submeter accurate
+        return $this->addToIndex($geohash, 'media__' . $imgId);
     }
 
     /**

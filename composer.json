@@ -15,7 +15,7 @@
     "php": ">=8.0",
     "ext-exif": "*",
     "ext-json": "*",
-    "mprins/dokuwiki-plugin-geophp": ">=2023-07-14"
+    "mprins/dokuwiki-plugin-geophp": ">=2023-11-08"
   },
   "config": {
     "platform": {
