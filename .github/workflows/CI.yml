@@ -1,9 +1,15 @@
 name: 'CI'
 
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   action:
+    name: "CI (${{ github.event_name }}) for ${{ matrix.php-version }} ${{ matrix.dokuwiki-branch }}"
     strategy:
       fail-fast: false
       matrix:
