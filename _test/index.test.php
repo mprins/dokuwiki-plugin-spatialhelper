@@ -30,9 +30,11 @@ class index_test extends DokuWikiTest
     }
 
     /**
-     * Testdata for @return array
+     * Test data provider.
      * @see index_test::test_convertDMStoD
      *
+     * @return array
+     * @see index_test::test_convertDMStoD
      */
     final public static function convertDMStoDTestdata(): array
     {
