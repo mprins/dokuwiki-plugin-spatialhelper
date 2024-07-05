@@ -17,9 +17,10 @@ class index_test extends DokuWikiTest
     protected $pluginsEnabled = array('spatialhelper');
 
     /**
-     * Testdata for @return array
-     * @see index_test::test_convertDMStoD
+     * Test data provider.
      *
+     * @return array
+     * @see index_test::test_convertDMStoD
      */
     final public static function convertDMStoDTestdata(): array
     {
