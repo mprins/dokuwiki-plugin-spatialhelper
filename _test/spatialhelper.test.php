@@ -23,7 +23,7 @@ use DokuWikiTest;
  * @group plugin_spatialhelper
  * @group plugins
  */
-class general_plugin_spatialhelper_test extends DokuWikiTest
+class spatialhelper_plugin_test extends DokuWikiTest
 {
 
     protected $pluginsEnabled = array('spatialhelper');
@@ -31,7 +31,7 @@ class general_plugin_spatialhelper_test extends DokuWikiTest
     /**
      * Simple test to make sure the plugin.info.txt is in correct format.
      */
-    final  public function test_plugininfo(): void
+    final public function test_plugininfo(): void
     {
         $file = __DIR__ . '/../plugin.info.txt';
         self::assertFileExists($file);
@@ -56,7 +56,7 @@ class general_plugin_spatialhelper_test extends DokuWikiTest
     /**
      * test if plugin is loaded.
      */
-    final  public function test_plugin_spatialhelper_isloaded(): void
+    final public function test_plugin_spatialhelper_isloaded(): void
     {
         global $plugin_controller;
         self::assertContains(
