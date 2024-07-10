@@ -1,15 +1,9 @@
 name: 'CI'
 
-on:
-  push:
-  pull_request:
-    branches:
-      - master
-  workflow_dispatch:
+on: [ push, pull_request, workflow_dispatch ]
 
 jobs:
-  action:
-    name: "CI (${{ github.event_name }}) for ${{ matrix.php-version }} ${{ matrix.dokuwiki-branch }}"
+  test:
     strategy:
       fail-fast: false
       matrix:
@@ -23,5 +17,5 @@ jobs:
 
     uses: mprins/.github/.github/workflows/test.yml@main
     with:
-      php-version: ${{ matrix.php-version }}
-      dokuwiki-branch: ${{ matrix.dokuwiki-branch }}
+      php-version: "${{ matrix.php-version }}"
+      dokuwiki-branch: "${{ matrix.dokuwiki-branch }}"
