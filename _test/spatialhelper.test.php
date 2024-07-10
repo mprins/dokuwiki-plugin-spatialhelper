@@ -21,7 +21,7 @@
  * @group plugin_spatialhelper
  * @group plugins
  */
-class spatialhelper_plugin_spatialhelper_test extends DokuWikiTest
+class spatialhelper_plugin_test extends DokuWikiTest
 {
 
     protected $pluginsEnabled = array('spatialhelper');
