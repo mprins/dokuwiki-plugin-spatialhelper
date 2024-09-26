@@ -24,5 +24,11 @@
   },
   "suggest": {
     "mprins/dokuwiki-plugin-geotag": ">=2023-07-14"
-  }
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/mprins"
+    }
+  ]
 }
