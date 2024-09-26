@@ -1,2 +1,2 @@
 https://github.com/mprins/dokuwiki-plugin-geophp.git lib/plugins/geophp
-https://github.com/mprins/dokuwiki-plugin-geophp.git lib/plugins/geotag
+https://github.com/mprins/dokuwiki-plugin-geotag.git lib/plugins/geotag
