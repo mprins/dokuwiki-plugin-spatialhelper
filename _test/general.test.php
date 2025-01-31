@@ -14,7 +14,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+namespace dokuwiki\plugin\spatialhelper\test;
 
+use DokuWikiTest;
 /**
  * General tests for the spatialhelper plugin.
  *
@@ -58,7 +60,9 @@ class general_plugin_spatialhelper_test extends DokuWikiTest
     {
         global $plugin_controller;
         self::assertContains(
-            'spatialhelper', $plugin_controller->getList(), "spatialhelper plugin is loaded"
+            'spatialhelper',
+            $plugin_controller->getList(),
+            "spatialhelper plugin is loaded"
         );
     }
 }
