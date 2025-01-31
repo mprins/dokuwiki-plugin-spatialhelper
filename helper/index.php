@@ -240,7 +240,7 @@ class helper_plugin_spatialhelper_index extends Plugin
     final public function getCoordsFromExif(string $id): Point|false
     {
         $exif = exif_read_data(mediaFN($id), 0, true);
-        if (empty($exif ['GPS'])) {
+        if (!$exif || empty($exif ['GPS'])) {
             return false;
         }
 
@@ -249,7 +249,7 @@ class helper_plugin_spatialhelper_index extends Plugin
                 $exif ['GPS'] ['GPSLatitude'] [0],
                 $exif ['GPS'] ['GPSLatitude'] [1],
                 $exif ['GPS'] ['GPSLatitude'] [2],
-                $exif ['GPS'] ['GPSLatitudeRef']
+                $exif ['GPS'] ['GPSLatitudeRef'] ?? 'N'
             ]
         );
 
@@ -258,7 +258,7 @@ class helper_plugin_spatialhelper_index extends Plugin
                 $exif ['GPS'] ['GPSLongitude'] [0],
                 $exif ['GPS'] ['GPSLongitude'] [1],
                 $exif ['GPS'] ['GPSLongitude'] [2],
-                $exif ['GPS'] ['GPSLongitudeRef']
+                $exif ['GPS'] ['GPSLongitudeRef'] ?? 'E'
             ]
         );
 
