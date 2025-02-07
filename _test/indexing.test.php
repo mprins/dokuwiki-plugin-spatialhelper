@@ -35,7 +35,12 @@ class indexing_test extends DokuWikiTest
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        print_r(__DIR__);
         TestUtils::rcopy(TMP_DIR, __DIR__ . '/data/');
+
+        if (mkdir(DOKU_TMP_DATA . 'log/debug/', 0777, true)) {
+            touch(DOKU_TMP_DATA . 'log/debug/' . date('Y-m-d') . '.log');
+        }
     }
 
     final public function setUp(): void
@@ -47,7 +52,17 @@ class indexing_test extends DokuWikiTest
         $conf['dontlog'] = [];
         $conf['cachetime'] = -1;
 
-        idx_addPage(':geotag', true, true);
+        saveWikiText(
+            'geotag',
+            'A geotagged page' . "\n\n" . '{{geotag>lat=52.132633, lon=5.291266, alt=9, placename:Sint-Oedenrode, region:NL-NB, country:NL, hide}}',
+            'Geotagging test page'
+        );
+
+        $data = [];
+        search($data, $conf['datadir'], 'search_allpages', array('skipacl' => true));
+        foreach ($data as $val) {
+            idx_addPage($val['id'], true, true);
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 {
   "name": "mprins/dokuwiki-plugin-spatialhelper",
   "description": "Provides spatial indexing and spatial search facilities.",
-  "homepage": " https://www.dokuwiki.org/plugin:spatialhelper",
+  "homepage": "https://www.dokuwiki.org/plugin:spatialhelper",
   "minimum-stability": "stable",
   "license": "proprietary",
   "type": "plugin",

@@ -147,7 +147,7 @@ class helper_plugin_spatialhelper_index extends Plugin
                 $pageIds [] = $id;
             }
             // TODO shortcut, need to make sure there is only one element, if not the index is corrupt
-            $knownHash = $knownHashes [0];
+            $knownHash = $knownHashes [0] ?? '';
 
             if ($knownHash === $geohash) {
                 Logger::debug("Document $id was found in index and has the same geohash, nothing to do.");
