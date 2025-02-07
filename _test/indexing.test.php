@@ -26,42 +26,39 @@
  */
 class indexing_test extends DokuWikiTest
 {
-
-    protected $pluginsEnabled = array('geotag', 'geophp', 'spatialhelper');
-
     /**
      * copy data and add pages to the index.
      */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        print_r(__DIR__);
         TestUtils::rcopy(TMP_DIR, __DIR__ . '/data/');
-
-        if (mkdir(DOKU_TMP_DATA . 'log/debug/', 0777, true)) {
-            touch(DOKU_TMP_DATA . 'log/debug/' . date('Y-m-d') . '.log');
-        }
     }
 
     final public function setUp(): void
     {
-        parent::setUp();
+        $this->pluginsEnabled = array(
+            'geophp',
+            'geotag',
+            'spatialhelper'
+        );
 
         global $conf;
         $conf['allowdebug'] = 1;
         $conf['dontlog'] = [];
         $conf['cachetime'] = -1;
 
-        saveWikiText(
-            'geotag',
-            'A geotagged page' . "\n\n" . '{{geotag>lat=52.132633, lon=5.291266, alt=9, placename:Sint-Oedenrode, region:NL-NB, country:NL, hide}}',
-            'Geotagging test page'
-        );
+        parent::setUp();
+
+        $indexer = plugin_load('helper', 'spatialhelper_index');
+        self::assertInstanceOf('helper_plugin_spatialhelper_index', $indexer);
 
         $data = [];
         search($data, $conf['datadir'], 'search_allpages', array('skipacl' => true));
+
         foreach ($data as $val) {
-            idx_addPage($val['id'], true, true);
+            idx_addPage($val['id']);
+            $indexer->updateSpatialIndex($val['id']);
         }
     }
 
@@ -70,13 +67,9 @@ class indexing_test extends DokuWikiTest
      */
     final public function testIndexed(): void
     {
-        $indexer = plugin_load('helper', 'spatialhelper_index');
-        self::assertInstanceOf('helper_plugin_spatialhelper_index', $indexer);
-        self::assertTrue($indexer->updateSpatialIndex(':geotag', true));
-
         // render the page
         $request = new TestRequest();
-        $response = $request->get(array('id' => 'geotag'), '/doku.php');
+        $response = $request->get(array('id' => 'geotag'));
 
         // test metadata
         self::assertEquals(
@@ -88,11 +81,33 @@ class indexing_test extends DokuWikiTest
             $response->queryHTML('meta[name="ICBM"]')->attr('content')
         );
 
-        // TODO / WIP test the geohash and index values
+        // test the geohash and index values
         self::assertStringStartsWith(
-        // u17b86kyx7j
-            'u17b86k',
-            $response->queryHTML('meta[name="geo.hash"]')->attr('content')
+            'u17b86kyx7jv',
+            $response->queryHTML('meta[name="geo.geohash"]')->attr('content')
         );
+    }
+
+
+    final public function testIndexFileExists(): void
+    {
+        self::assertFileExists(TMP_DIR . '/data/index/spatial.idx');
+    }
+
+    final public function testIndexFileNotEmpty(): void
+    {
+        self::assertGreaterThan(0, filesize(TMP_DIR . '/data/index/spatial.idx'));
+    }
+
+    final public function testSearchNearby(): void
+    {
+        $search = plugin_load('helper', 'spatialhelper_search');
+        self::assertInstanceOf('helper_plugin_spatialhelper_search', $search);
+
+        $result = $search->findNearby('u17b86kyx7jv');
+        self::assertIsArray($result);
+        self::assertNotEmpty($result);
+        self::assertEquals('geotag', $result['pages'][0]['id']);
+        self::assertEmpty($result['media']);
     }
 }
