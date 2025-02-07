@@ -47,7 +47,7 @@ class indexing_test extends DokuWikiTest
         $conf['dontlog'] = [];
         $conf['cachetime'] = -1;
 
-        idx_addPage('geotag', true, true);
+        idx_addPage(':geotag', true, true);
     }
 
     /**
@@ -56,25 +56,25 @@ class indexing_test extends DokuWikiTest
     final public function testIndexed(): void
     {
         $indexer = plugin_load('helper', 'spatialhelper_index');
-        $this->assertInstanceOf('helper_plugin_spatialhelper_index', $indexer);
-        $this->assertTrue($indexer->updateSpatialIndex('geotag'));
+        self::assertInstanceOf('helper_plugin_spatialhelper_index', $indexer);
+        self::assertTrue($indexer->updateSpatialIndex(':geotag', true));
 
         // render the page
         $request = new TestRequest();
         $response = $request->get(array('id' => 'geotag'), '/doku.php');
 
         // test metadata
-        $this->assertEquals(
+        self::assertEquals(
             '52.132633;5.291266;9',
             $response->queryHTML('meta[name="geo.position"]')->attr('content')
         );
-        $this->assertEquals(
+        self::assertEquals(
             '52.132633, 5.291266',
             $response->queryHTML('meta[name="ICBM"]')->attr('content')
         );
 
         // TODO / WIP test the geohash and index values
-        $this->assertStringStartsWith(
+        self::assertStringStartsWith(
         // u17b86kyx7j
             'u17b86k',
             $response->queryHTML('meta[name="geo.hash"]')->attr('content')

@@ -100,15 +100,19 @@ class helper_plugin_spatialhelper_index extends Plugin
      *
      * @param string $id
      *          the document ID
+     * @param bool $verbose
+     *         if true, echo debug info
      * @throws Exception
      */
-    final public function updateSpatialIndex(string $id): bool
+    final public function updateSpatialIndex(string $id, bool $verbose = false): bool
     {
         $geotags = p_get_metadata($id, 'geo');
         if (empty($geotags)) {
+            if ($verbose) echo "No geo metadata found for page $id" . DOKU_LF;
             return false;
         }
         if (empty($geotags ['lon']) || empty($geotags ['lat'])) {
+            if ($verbose) echo "No valid geo metadata found for page $id" . DOKU_LF;
             return false;
         }
         Logger::debug("Geo metadata found for page $id", $geotags);

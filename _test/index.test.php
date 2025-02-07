@@ -3,7 +3,6 @@
 namespace dokuwiki\plugin\spatialhelper\test;
 
 use DokuWikiTest;
-use helper_plugin_spatialhelper_index;
 use TestUtils;
 
 /**
@@ -31,9 +30,9 @@ class index_test extends DokuWikiTest
 
     /**
      * Test data provider.
+     * @return array
      * @see index_test::test_convertDMStoD
      *
-     * @return array
      * @see index_test::test_convertDMStoD
      */
     final public static function convertDMStoDTestdata(): array
@@ -77,7 +76,7 @@ class index_test extends DokuWikiTest
     final public function test_convertDMStoD(array $input, float $expected_output, string $msg): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');
-        assert($index instanceof helper_plugin_spatialhelper_index);
+        self::assertInstanceOf('helper_plugin_spatialhelper_index', $index);
 
         $actual_output = $index->convertDMStoD($input);
 
@@ -87,7 +86,7 @@ class index_test extends DokuWikiTest
     final public function test_ImageWithoutGeotag(): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');
-        assert($index instanceof helper_plugin_spatialhelper_index);
+        self::assertInstanceOf('helper_plugin_spatialhelper_index', $index);
 
         $actual_output = $index->getCoordsFromExif(':vesder_eupen_no_gps.jpg');
         self::assertFalse($actual_output, 'Expected no geotag to be found');
@@ -96,7 +95,7 @@ class index_test extends DokuWikiTest
     final public function test_ImageWithGeotag(): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');
-        assert($index instanceof helper_plugin_spatialhelper_index);
+        self::assertInstanceOf('helper_plugin_spatialhelper_index', $index);
 
         // lat/lon: 37°4'36.12",31°39'21.96" or x/y: 31.6561,37.0767
         $actual_output = $index->getCoordsFromExif(':manavgat_restaurant_handost_with_gps.jpg');
