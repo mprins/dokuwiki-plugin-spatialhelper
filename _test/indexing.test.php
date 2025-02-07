@@ -104,10 +104,14 @@ class indexing_test extends DokuWikiTest
         $search = plugin_load('helper', 'spatialhelper_search');
         self::assertInstanceOf('helper_plugin_spatialhelper_search', $search);
 
-        $result = $search->findNearby('u17b86kyx7jv');
+        $result = $search->findNearby('u17b86kyx7');
         self::assertIsArray($result);
         self::assertNotEmpty($result);
-        self::assertEquals('geotag', $result['pages'][0]['id']);
         self::assertEmpty($result['media']);
+        self::assertEquals('geotag', $result['pages'][0]['id']);
+        self::assertEquals('u17b86kyx7', $result['geohash']);
+        self::assertEquals(0.6, $result['precision']);
+        self::assertEqualsWithDelta(52.1326, $result['lat'], 0.001);
+        self::assertEqualsWithDelta(5.2912, $result['lon'], 0.001);
     }
 }
