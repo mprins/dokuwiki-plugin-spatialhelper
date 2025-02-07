@@ -20,11 +20,14 @@
  *
  * @group plugin_spatialhelper
  * @group plugins
+ *
+ * @noinspection AutoloadingIssuesInspection
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotCamelCaps
  */
 class indexing_test extends DokuWikiTest
 {
 
-    protected $pluginsEnabled = array('geotag', 'spatialhelper');
+    protected $pluginsEnabled = array('geotag', 'geophp', 'spatialhelper');
 
     /**
      * copy data and add pages to the index.
@@ -32,9 +35,6 @@ class indexing_test extends DokuWikiTest
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        global $conf;
-        $conf['allowdebug'] = 1;
-
         TestUtils::rcopy(TMP_DIR, __DIR__ . '/data/');
     }
 
@@ -44,25 +44,40 @@ class indexing_test extends DokuWikiTest
 
         global $conf;
         $conf['allowdebug'] = 1;
+        $conf['dontlog'] = [];
         $conf['cachetime'] = -1;
 
-        $data = array();
-        search($data, $conf['datadir'], 'search_allpages', array('skipacl' => true));
-
-        $verbose = false;
-        $force = false;
-        foreach ($data as $val) {
-            idx_addPage($val['id'], $verbose, $force);
-        }
+        idx_addPage('geotag', true, true);
     }
 
-    final public function test_indexed(): void
+    /**
+     * @throws Exception if anything goes wrong
+     */
+    final public function testIndexed(): void
     {
+        $indexer = plugin_load('helper', 'spatialhelper_index');
+        $this->assertInstanceOf('helper_plugin_spatialhelper_index', $indexer);
+        $this->assertTrue($indexer->updateSpatialIndex('geotag'));
+
         // render the page
         $request = new TestRequest();
         $response = $request->get(array('id' => 'geotag'), '/doku.php');
 
-        $this->assertEquals('52.132633;5.291266;9', $response->queryHTML('meta[name="geo.position"]')->attr('content'));
-        // TODO test the geohash and index values
+        // test metadata
+        $this->assertEquals(
+            '52.132633;5.291266;9',
+            $response->queryHTML('meta[name="geo.position"]')->attr('content')
+        );
+        $this->assertEquals(
+            '52.132633, 5.291266',
+            $response->queryHTML('meta[name="ICBM"]')->attr('content')
+        );
+
+        // TODO / WIP test the geohash and index values
+        $this->assertStringStartsWith(
+        // u17b86kyx7j
+            'u17b86k',
+            $response->queryHTML('meta[name="geo.hash"]')->attr('content')
+        );
     }
 }
