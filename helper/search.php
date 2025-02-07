@@ -83,7 +83,7 @@ class helper_plugin_spatialhelper_search extends Plugin
 
     /**
      * finds nearby elements in the index based on the geohash.
-     * returns a list of documents and the bunding box.
+     * returns a list of documents and the bounding box.
      *
      * @param string $geohash
      * @param Point|null $p
@@ -172,13 +172,18 @@ class helper_plugin_spatialhelper_search extends Plugin
             static fn($a, $b) => strnatcmp($a ['distance'], $b ['distance'])
         );
 
+        if (strlen($geohash) < 10) {
+            $precision = $this->precision[strlen($geohash)];
+        } else {
+            $precision = $this->precision[9];
+        }
         return [
             'pages' => $pages,
             'media' => $media,
             'lat' => $decodedPoint->y(),
             'lon' => $decodedPoint->x(),
             'geohash' => $geohash,
-            'precision' => $this->precision [strlen($geohash)]
+            'precision' => $precision
         ];
     }
 }
