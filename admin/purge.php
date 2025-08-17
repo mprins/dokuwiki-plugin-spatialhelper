@@ -31,12 +31,12 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::getMenuSort()
      */
-    final  public function getMenuSort(): int
+    final public function getMenuSort(): int
     {
         return 801;
     }
 
-    final  public function getMenuIcon(): string
+    final public function getMenuIcon(): string
     {
         $plugin = $this->getPluginName();
         return DOKU_PLUGIN . $plugin . '/admin/purge.svg';
@@ -47,7 +47,7 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::handle()
      */
-    final  public function handle(): void
+    final public function handle(): void
     {
         if (isset($_REQUEST ['purgeindex'])) {
             global $conf;
@@ -74,7 +74,7 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
      *
      * @see DokuWiki_Admin_Plugin::html()
      */
-    final  public function html(): void
+    final public function html(): void
     {
         echo $this->locale_xhtml('admin_purge_intro');
 
