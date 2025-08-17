@@ -99,7 +99,7 @@ class action_plugin_spatialhelper extends ActionPlugin
      * @param Event $event
      *          event object
      */
-    final   public function removeFromIndex(Event $event): void
+    final public function removeFromIndex(Event $event): void
     {
         // event data:
         // $data[0] – The raw arguments for io_saveFile as an array. Do not change file path.
@@ -133,7 +133,7 @@ class action_plugin_spatialhelper extends ActionPlugin
      *
      * @param Event $event
      */
-    final  public function handleSitemapGenerateBefore(Event $event): void
+    final public function handleSitemapGenerateBefore(Event $event): void
     {
         $path = mediaFN($this->getConf('media_kml'));
         $lastmod = @filemtime($path);
@@ -146,7 +146,7 @@ class action_plugin_spatialhelper extends ActionPlugin
      * @param Event $event
      *          event object, not used
      */
-    final  public function handleSitemapGenerateAfter(Event $event): bool
+    final public function handleSitemapGenerateAfter(Event $event): bool
     {
         // $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already
         //      contains all public pages of the wiki
@@ -350,7 +350,7 @@ class action_plugin_spatialhelper extends ActionPlugin
      * removes the media from the index.
      * @param Event $event event object with data
      */
-    final  public function handleMediaDeleted(Event $event): void
+    final public function handleMediaDeleted(Event $event): void
     {
         // data['id'] ID data['unl'] unlink return code
         // data['del'] Namespace directory unlink return code

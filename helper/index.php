@@ -274,7 +274,7 @@ class helper_plugin_spatialhelper_index extends Plugin
      *
      * @param array $param array of rational DMS
      */
-    final  public function convertDMStoD(array $param): float
+    final public function convertDMStoD(array $param): float
     {
         //        if (!(is_array($param))) {
         //            $param = [$param];
