@@ -4,7 +4,7 @@ use dokuwiki\Extension\Plugin;
 use dokuwiki\Logger;
 
 /*
- * Copyright (c) 2014-2023 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,13 +24,15 @@ use dokuwiki\Logger;
  *
  * @license BSD license
  * @author  Mark Prins
+ *
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class helper_plugin_spatialhelper_sitemap extends Plugin
 {
     /**
      * spatial index.
      */
-    private $spatial_idx;
+    private mixed $spatial_idx;
 
     /**
      * constructor, load spatial index.
@@ -41,9 +43,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
         $idx_dir = $conf['indexdir'];
         if (!@file_exists($idx_dir . '/spatial.idx')) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
-            if ($indexer !== null) {
-                $indexer->generateSpatialIndex();
-            }
+            $indexer?->generateSpatialIndex();
         }
         $this->spatial_idx = unserialize(
             io_readFile($idx_dir . '/spatial.idx', false),
@@ -106,7 +106,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
             // get list of id's
             foreach ($idxEntry as $id) {
                 // for document item in the index
-                if (strpos($id, 'media__') !== 0) {
+                if (!str_starts_with($id, 'media__')) {
                     if ($this->skipPage($id, $namespace)) {
                         continue;
                     }
@@ -158,7 +158,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
 
         if (!empty($namespace)) {
             // only if id is in or below namespace
-            if (0 !== strpos(getNS($id), $namespace)) {
+            if (!str_starts_with(getNS($id), $namespace)) {
                 return true;
             }
         }
@@ -202,7 +202,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
             // get list of id's
             foreach ($idxEntry as $id) {
                 // for document item in the index
-                if (strpos($id, 'media__') !== 0) {
+                if (!str_starts_with($id, 'media__')) {
                     if ($this->skipPage($id, $namespace)) {
                         continue;
                     }

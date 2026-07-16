@@ -16,6 +16,7 @@
  */
 namespace dokuwiki\plugin\spatialhelper\test;
 
+use dokuwiki\MailUtils;
 use DokuWikiTest;
 /**
  * General tests for the spatialhelper plugin.
@@ -47,9 +48,9 @@ class spatialhelper_plugin_test extends DokuWikiTest
         self::assertArrayHasKey('url', $info);
 
         self::assertEquals('spatialhelper', $info['base']);
-        self::assertRegExp('/^https?:\/\//', $info['url']);
-        self::assertTrue(mail_isvalid($info['email']));
-        self::assertRegExp('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
+        self::assertMatchesRegularExpression('/^https?:\/\//', $info['url']);
+        self::assertTrue(MailUtils::isValid($info['email']));
+        self::assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
         self::assertNotFalse(strtotime($info['date']));
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011-2023 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,8 @@ use geoPHP\Geometry\Point;
  *
  * @license BSD license
  * @author  Mark Prins
+ *
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class helper_plugin_spatialhelper_search extends Plugin
 {
@@ -35,15 +37,14 @@ class helper_plugin_spatialhelper_search extends Plugin
      *
      * @var array
      */
-    protected $spatial_idx = [];
+    protected mixed $spatial_idx = [];
     /**
      * Precision, Distance of Adjacent Cell in Meters.
      *
      * @see https://stackoverflow.com/questions/13836416/geohash-and-max-distance
      *
-     * @var float
      */
-    private $precision = [5_003_530, 625441, 123264, 19545, 3803, 610, 118, 19, 3.7, 0.6];
+    private array|float $precision = [5_003_530, 625441, 123264, 19545, 3803, 610, 118, 19, 3.7, 0.6];
 
     /**
      * constructor; initialize/load spatial index.
@@ -118,7 +119,7 @@ class helper_plugin_spatialhelper_search extends Plugin
         foreach ($adjacent as $adjHash) {
             if (is_array($this->spatial_idx)) {
                 foreach ($this->spatial_idx as $_geohash => $_docIds) {
-                    if (strpos($_geohash, (string)$adjHash) !== false) {
+                    if (str_contains($_geohash, (string)$adjHash)) {
                         // if $adjHash similar to geohash
                         $docIds = array_merge($docIds, $_docIds);
                     }
@@ -134,7 +135,7 @@ class helper_plugin_spatialhelper_search extends Plugin
         $indexer = plugin_load('helper', 'spatialhelper_index');
 
         foreach ($docIds as $id) {
-            if (strpos($id, 'media__') === 0) {
+            if (str_starts_with($id, 'media__')) {
                 $id = substr($id, strlen('media__'));
                 if (auth_quickaclcheck($id) >= /*AUTH_READ*/ 1) {
                     $point = $indexer->getCoordsFromExif($id);

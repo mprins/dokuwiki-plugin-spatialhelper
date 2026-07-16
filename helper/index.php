@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011-2024 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,7 @@ use geoPHP\Geometry\Point;
  *
  * @license BSD license
  * @author  Mark Prins
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class helper_plugin_spatialhelper_index extends Plugin
 {
@@ -108,11 +109,15 @@ class helper_plugin_spatialhelper_index extends Plugin
     {
         $geotags = p_get_metadata($id, 'geo');
         if (empty($geotags)) {
-            if ($verbose) echo "No geo metadata found for page $id" . DOKU_LF;
+            if ($verbose) {
+                echo "No geo metadata found for page $id" . DOKU_LF;
+            }
             return false;
         }
         if (empty($geotags ['lon']) || empty($geotags ['lat'])) {
-            if ($verbose) echo "No valid geo metadata found for page $id" . DOKU_LF;
+            if ($verbose) {
+                echo "No valid geo metadata found for page $id" . DOKU_LF;
+            }
             return false;
         }
         Logger::debug("Geo metadata found for page $id", $geotags);
@@ -214,7 +219,6 @@ class helper_plugin_spatialhelper_index extends Plugin
      */
     final public function indexImage(string $imgId): bool
     {
-        // test for supported files (jpeg only)
         if (
             (!str_ends_with(strtolower($imgId), '.jpg')) &&
             (!str_ends_with(strtolower($imgId), '.jpeg'))

@@ -3,6 +3,7 @@
 namespace dokuwiki\plugin\spatialhelper\test;
 
 use DokuWikiTest;
+use Exception;
 use TestUtils;
 
 /**
@@ -83,6 +84,9 @@ class index_test extends DokuWikiTest
         self::assertEqualsWithDelta($expected_output, $actual_output, 0.0001, $msg);
     }
 
+    /**
+     * @throws Exception
+     */
     final public function test_ImageWithoutGeotag(): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');
@@ -92,6 +96,9 @@ class index_test extends DokuWikiTest
         self::assertFalse($actual_output, 'Expected no geotag to be found');
     }
 
+    /**
+     * @throws Exception
+     */
     final public function test_ImageWithGeotag(): void
     {
         $index = plugin_load('helper', 'spatialhelper_index');

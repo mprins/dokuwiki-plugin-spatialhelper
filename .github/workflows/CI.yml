@@ -10,13 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.2' ]
+        php-version: [ '8.2', '8.5' ]
         dokuwiki-branch: [ 'master', 'stable' ]
-        include:
-          - php-version: '8.4'
-            dokuwiki-branch: 'master'
-          - php-version: '8.3'
-            dokuwiki-branch: 'master'
 
     uses: mprins/.github/.github/workflows/test.yml@main
     with:

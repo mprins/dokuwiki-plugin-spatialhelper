@@ -15,6 +15,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+use dokuwiki\Search\Indexer;
+
 /**
  * Tests for the spatialhelper plugin.
  *
@@ -57,7 +59,7 @@ class indexing_test extends DokuWikiTest
         search($data, $conf['datadir'], 'search_allpages', array('skipacl' => true));
 
         foreach ($data as $val) {
-            idx_addPage($val['id']);
+            (new Indexer())->addPage($val['id']);
             $indexer->updateSpatialIndex($val['id']);
         }
     }
@@ -99,6 +101,9 @@ class indexing_test extends DokuWikiTest
         self::assertGreaterThan(0, filesize(TMP_DIR . '/data/index/spatial.idx'));
     }
 
+    /**
+     * @throws Exception
+     */
     final public function testSearchNearby(): void
     {
         $search = plugin_load('helper', 'spatialhelper_search');
