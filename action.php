@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011-2024 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2011-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,8 @@ use dokuwiki\Sitemap\Item;
  *
  * @license BSD license
  * @author  Mark C. Prins <mprins@users.sf.net>
+ *
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class action_plugin_spatialhelper extends ActionPlugin
 {
@@ -121,9 +123,7 @@ class action_plugin_spatialhelper extends ActionPlugin
                     $id = $event->data [1] . ":" . $event->data [2];
                 }
                 $indexer = plugin_load('helper', 'spatialhelper_index');
-                if ($indexer !== null) {
-                    $indexer->deleteFromIndex($id);
-                }
+                $indexer?->deleteFromIndex($id);
             }
         }
     }
@@ -143,10 +143,9 @@ class action_plugin_spatialhelper extends ActionPlugin
     /**
      * Create a spatial sitemap or attach the geo/kml map to the sitemap.
      *
-     * @param Event $event
      *          event object, not used
      */
-    final public function handleSitemapGenerateAfter(Event $event): bool
+    final public function handleSitemapGenerateAfter(): bool
     {
         // $event→data['items']: Array of SitemapItem instances, the array of sitemap items that already
         //      contains all public pages of the wiki
@@ -259,7 +258,7 @@ class action_plugin_spatialhelper extends ActionPlugin
             return;
         }
 
-        // print a HTML list
+        // print the HTML list
         echo '<h1>' . $this->getLang('results_header') . '</h1>' . DOKU_LF;
         echo '<div class="level1">' . DOKU_LF;
         if ($pages !== []) {
@@ -338,9 +337,7 @@ class action_plugin_spatialhelper extends ActionPlugin
         // if it's a supported type call appropriate index function
         if (str_contains($event->data [3], 'image/jpeg')) {
             $indexer = plugin_load('helper', 'spatialhelper_index');
-            if ($indexer !== null) {
-                $indexer->indexImage($event->data [2]);
-            }
+            $indexer?->indexImage($event->data [2]);
         }
         // TODO add image/tiff
         // TODO kml, gpx, geojson...
@@ -359,9 +356,7 @@ class action_plugin_spatialhelper extends ActionPlugin
 
         // remove the media id from the index
         $indexer = plugin_load('helper', 'spatialhelper_index');
-        if ($indexer !== null) {
-            $indexer->deleteFromIndex('media__' . $event->data ['id']);
-        }
+        $indexer?->deleteFromIndex('media__' . $event->data ['id']);
     }
 
     /**

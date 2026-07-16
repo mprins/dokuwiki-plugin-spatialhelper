@@ -12,18 +12,18 @@
     }
   ],
   "require": {
-    "php": ">=8.0",
+    "php": ">=8.2",
     "ext-exif": "*",
     "ext-json": "*",
-    "mprins/dokuwiki-plugin-geophp": ">=2023-11-08"
+    "mprins/dokuwiki-plugin-geophp": ">=2025-05-16"
   },
   "config": {
     "platform": {
-      "php": "8.0"
+      "php": "8.2"
     }
   },
   "suggest": {
-    "mprins/dokuwiki-plugin-geotag": ">=2023-07-14"
+    "mprins/dokuwiki-plugin-geotag": ">=2025-05-16"
   },
   "funding": [
     {

@@ -3,7 +3,7 @@
 use dokuwiki\Extension\SyntaxPlugin;
 
 /*
- * Copyright (c) 2014-2023 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,6 +23,8 @@ use dokuwiki\Extension\SyntaxPlugin;
  *
  * @license BSD license
  * @author  Mark C. Prins <mprins@users.sf.net>
+ *
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class syntax_plugin_spatialhelper_findnearby extends SyntaxPlugin
 {

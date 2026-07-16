@@ -4,7 +4,7 @@ use dokuwiki\Extension\AdminPlugin;
 use dokuwiki\Form\Form;
 
 /*
- * Copyright (c) 2014-2023 Mark C. Prins <mprins@users.sf.net>
+ * Copyright (c) 2014-2026 Mark C. Prins <mprins@users.sf.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,6 +24,8 @@ use dokuwiki\Form\Form;
  * This component purges and recreates the spatial index and sitemaps.
  *
  * @author Mark Prins
+ *
+ * @phpcs:disable Squiz.Classes.ValidClassName.NotPascalCase
  */
 class admin_plugin_spatialhelper_purge extends AdminPlugin
 {
@@ -53,14 +55,12 @@ class admin_plugin_spatialhelper_purge extends AdminPlugin
             global $conf;
             $path = $conf ['indexdir'] . '/spatial.idx';
             if (file_exists($path) && unlink($path)) {
-                msg($this->getLang('admin_purged_tiles'), 0);
+                msg($this->getLang('admin_purged_tiles'));
             }
         }
 
         $indexer = plugin_load('helper', 'spatialhelper_index');
-        if (isset($indexer)) {
-            $indexer->generateSpatialIndex();
-        }
+        $indexer?->generateSpatialIndex();
 
         $sitemapper = plugin_load('helper', 'spatialhelper_sitemap');
         if (isset($sitemapper)) {
