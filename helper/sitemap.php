@@ -32,7 +32,7 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
     /**
      * spatial index.
      */
-    private mixed $spatial_idx;
+    private readonly mixed $spatial_idx;
 
     /**
      * constructor, load spatial index.
@@ -53,17 +53,15 @@ class helper_plugin_spatialhelper_sitemap extends Plugin
 
     final public function getMethods(): array
     {
-        $result[] = [
+        return [[
             'name' => 'createGeoRSSSitemap',
             'desc' => 'create a spatial sitemap in GeoRSS format.',
             'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']
-        ];
-        $result[] = [
+        ], [
             'name' => 'createKMLSitemap',
             'desc' => 'create a spatial sitemap in KML format.',
             'params' => ['path' => 'string'], 'return' => ['success' => 'boolean']
-        ];
-        return $result;
+        ]];
     }
 
     /**
