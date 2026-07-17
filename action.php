@@ -155,7 +155,7 @@ class action_plugin_spatialhelper extends ActionPlugin
             $rss = $helper->createGeoRSSSitemap($this->getConf('media_georss'));
 
             if (!empty($this->getConf('sitemap_namespaces'))) {
-                $namespaces = array_map('trim', explode("\n", $this->getConf('sitemap_namespaces')));
+                $namespaces = array_map(trim(...), explode("\n", $this->getConf('sitemap_namespaces')));
                 foreach ($namespaces as $namespace) {
                     $kmlN = $helper->createKMLSitemap($namespace . $this->getConf('media_kml'));
                     $rssN = $helper->createGeoRSSSitemap($namespace . $this->getConf('media_georss'));
@@ -215,16 +215,10 @@ class action_plugin_spatialhelper extends ActionPlugin
 
         $showMedia = $INPUT->bool('showMedia', true);
 
-        switch ($param['format']) {
-            case 'JSON':
-                $this->printJSON($results);
-                break;
-            case 'HTML':
-                // fall through to default
-            default:
-                $this->printHTML($results, $showMedia);
-                break;
-        }
+        match ($param['format']) {
+            'JSON' => $this->printJSON($results),
+            default => $this->printHTML($results, $showMedia),
+        };
     }
 
     /**
